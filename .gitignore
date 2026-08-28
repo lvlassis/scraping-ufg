@@ -1,0 +1,5 @@
+__pycache__
+html_samples/
+.scrapy_cache/
+.env
+/.venv

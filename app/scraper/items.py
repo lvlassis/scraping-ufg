@@ -1,0 +1,22 @@
+import scrapy
+
+class DiscenteItem(scrapy.Item):
+    nome = scrapy.Field()
+    matricula = scrapy.Field()
+    curso = scrapy.Field()
+    nivel = scrapy.Field()
+    status = scrapy.Field()
+    email = scrapy.Field()
+    entrada = scrapy.Field()
+    ip = scrapy.Field()
+    ti = scrapy.Field()
+    mge = scrapy.Field()
+    pmf = scrapy.Field()
+    ta = scrapy.Field()
+    qr = scrapy.Field()
+    mre = scrapy.Field()
+    ch_exigida = scrapy.Field()
+    ch_cursada = scrapy.Field()
+    materias = scrapy.Field()
+    atividades = scrapy.Field()
+
