@@ -7,9 +7,9 @@ _lock = threading.Lock()
 _store: dict = {}
 
 
-def set_data(key: str, data: list) -> None:
+def set_data(key: str, data: list, error: str | None = None) -> None:
     with _lock:
-        _store[key] = {"data": data, "updated_at": datetime.now().isoformat()}
+        _store[key] = {"data": data, "updated_at": datetime.now().isoformat(), "error": error}
 
 
 def get_data(key: str) -> dict | None:

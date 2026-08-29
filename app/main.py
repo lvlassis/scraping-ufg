@@ -1,3 +1,5 @@
+import asyncio
+import logging
 import os
 from contextlib import asynccontextmanager
 
@@ -7,16 +9,32 @@ from fastapi import FastAPI
 load_dotenv()
 
 from app.api.routes import discente
-from app.scraper.runner import run_spider_in_thread
+from app.scraper.heartbeat import heartbeat_loop
 
 os.environ.setdefault("SCRAPY_SETTINGS_MODULE", "app.scraper.settings")
+
+def _setup_logging() -> None:
+    debug = os.getenv("DEBUG", "").lower() == "true"
+    level = logging.DEBUG if debug else logging.INFO
+    app_logger = logging.getLogger("app")
+    app_logger.setLevel(level)
+    # O uvicorn só configura seus próprios loggers; o root logger fica sem handler.
+    # Reutilizamos o handler do uvicorn para que logs de app.* apareçam no console.
+    uvicorn_handlers = logging.getLogger("uvicorn").handlers
+    if uvicorn_handlers:
+        for handler in uvicorn_handlers:
+            app_logger.addHandler(handler)
+        app_logger.propagate = False
+
+
+_setup_logging()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Popula o cache ao iniciar a aplicação
-    # run_spider_in_thread(NoticiasSpider)
+    task = asyncio.create_task(heartbeat_loop())
     yield
+    task.cancel()
 
 
 app = FastAPI(
