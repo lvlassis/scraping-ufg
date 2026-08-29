@@ -19,4 +19,5 @@ class DiscenteItem(scrapy.Item):
     ch_cursada = scrapy.Field()
     materias = scrapy.Field()
     atividades = scrapy.Field()
+    atualizacoes_turma = scrapy.Field()
 

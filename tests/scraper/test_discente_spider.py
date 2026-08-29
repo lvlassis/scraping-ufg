@@ -37,21 +37,6 @@ class TestToFloat:
         assert DiscenteSpider._to_float("") is None
 
 
-# ── Etapa 6: _slug ───────────────────────────────────────────────────────────
-
-class TestSlug:
-    def test_espacos_viram_hifen(self):
-        assert DiscenteSpider._slug("Algoritmos e Programação") == "algoritmos-e-programacao"
-
-    def test_acentos_removidos(self):
-        assert DiscenteSpider._slug("Cálculo Diferencial") == "calculo-diferencial"
-
-    def test_caracteres_especiais_removidos(self):
-        assert DiscenteSpider._slug("Física I (Obrigatória)") == "fisica-i-obrigatoria"
-
-    def test_espacos_nas_bordas_removidos(self):
-        assert DiscenteSpider._slug("  Teoria dos Grafos  ") == "teoria-dos-grafos"
-
 
 # ── Etapa 1: _check_response ─────────────────────────────────────────────────
 
@@ -161,15 +146,19 @@ class TestMaterias:
     </table>
     """
 
-    def test_chaves_sao_slugs_dos_nomes(self):
+    def test_quantidade_de_materias(self):
         result = _spider()._materias(_resp(self.HTML))
-        assert "algoritmos-e-programacao" in result
-        assert "calculo-i" in result
+        assert len(result) == 2
+
+    def test_nomes_das_materias(self):
+        result = _spider()._materias(_resp(self.HTML))
+        nomes = [m["nome"] for m in result]
+        assert "Algoritmos e Programação" in nomes
+        assert "Cálculo I" in nomes
 
     def test_campos_de_cada_materia(self):
         result = _spider()._materias(_resp(self.HTML))
-        materia = result["algoritmos-e-programacao"]
-        assert materia["nome"] == "Algoritmos e Programação"
+        materia = next(m for m in result if m["nome"] == "Algoritmos e Programação")
         assert materia["local"] == "AT4"
         assert materia["horario"] == "2M12345"
 
@@ -180,7 +169,7 @@ class TestMaterias:
           <tbody></tbody>
         </table>
         """
-        assert _spider()._materias(_resp(html)) == {}
+        assert _spider()._materias(_resp(html)) == []
 
     def test_linha_sem_nome_e_ignorada(self):
         html = """
@@ -191,7 +180,183 @@ class TestMaterias:
           </tbody>
         </table>
         """
-        assert _spider()._materias(_resp(html)) == {}
+        assert _spider()._materias(_resp(html)) == []
+
+
+# ── Etapa 8: _parse_due ──────────────────────────────────────────────────────
+
+class TestParseDue:
+    def test_formato_basico(self):
+        assert DiscenteSpider._parse_due("24/08/2026 21:35") == "2026-08-24T21:35:00-03:00"
+
+    def test_formato_com_sufixo_dias(self):
+        assert DiscenteSpider._parse_due("31/08/2026 23:59 (2 dias)") == "2026-08-31T23:59:00-03:00"
+
+    def test_minuto_um_digito(self):
+        assert DiscenteSpider._parse_due("24/08/2026 22:0") == "2026-08-24T22:00:00-03:00"
+
+    def test_texto_sem_data_retorna_none(self):
+        assert DiscenteSpider._parse_due("Sem data") is None
+
+    def test_texto_vazio_retorna_none(self):
+        assert DiscenteSpider._parse_due("") is None
+
+
+# ── Etapa 9: _atividades ─────────────────────────────────────────────────────
+
+class TestAtividades:
+    _HTML_ALERTA = """
+    <div id="avaliacao-portal">
+      <table><tbody>
+        <tr>
+          <td><img src="/sigaa/img/prova_semana.png" title="Atividade na Semana"></td>
+          <td>31/08/2026 23:59 (2 dias)</td>
+          <td><small>MATÉRIA A<br><strong>Tarefa:</strong><a href="#">Nome da Atividade</a></small></td>
+        </tr>
+      </tbody></table>
+    </div>
+    """
+
+    _HTML_NORMAL = """
+    <div id="avaliacao-portal">
+      <table><tbody>
+        <tr>
+          <td></td>
+          <td><font color="gray">24/08/2026 21:35</font></td>
+          <td><small><font color="gray">MATÉRIA B<br><strong>Tarefa:</strong><a href="#">Outra Atividade</a></font></small></td>
+        </tr>
+      </tbody></table>
+    </div>
+    """
+
+    def test_tipo_alerta_com_img(self):
+        ativ = _spider()._atividades(_resp(self._HTML_ALERTA))
+        assert ativ[0]["tipo"] == "alerta"
+
+    def test_tipo_normal_sem_img(self):
+        ativ = _spider()._atividades(_resp(self._HTML_NORMAL))
+        assert ativ[0]["tipo"] == "normal"
+
+    def test_due_com_sufixo_dias(self):
+        ativ = _spider()._atividades(_resp(self._HTML_ALERTA))
+        assert ativ[0]["due"] == "2026-08-31T23:59:00-03:00"
+
+    def test_due_com_font_gray(self):
+        ativ = _spider()._atividades(_resp(self._HTML_NORMAL))
+        assert ativ[0]["due"] == "2026-08-24T21:35:00-03:00"
+
+    def test_nome_extraido_do_link(self):
+        ativ = _spider()._atividades(_resp(self._HTML_ALERTA))
+        assert ativ[0]["nome"] == "Nome da Atividade"
+
+    def test_materia_sem_font(self):
+        ativ = _spider()._atividades(_resp(self._HTML_ALERTA))
+        assert ativ[0]["materia"] == "MATÉRIA A"
+
+    def test_materia_dentro_de_font(self):
+        ativ = _spider()._atividades(_resp(self._HTML_NORMAL))
+        assert ativ[0]["materia"] == "MATÉRIA B"
+
+    def test_id_e_string_hexadecimal(self):
+        ativ = _spider()._atividades(_resp(self._HTML_ALERTA))
+        int(ativ[0]["id"], 16)
+
+    def test_id_deterministico(self):
+        assert _spider()._atividades(_resp(self._HTML_ALERTA))[0]["id"] == \
+               _spider()._atividades(_resp(self._HTML_ALERTA))[0]["id"]
+
+    def test_ids_distintos_para_atividades_distintas(self):
+        html = f"""
+        <div id="avaliacao-portal"><table><tbody>
+          {self._HTML_ALERTA.split('<tbody>')[1].split('</tbody>')[0]}
+          {self._HTML_NORMAL.split('<tbody>')[1].split('</tbody>')[0]}
+        </tbody></table></div>
+        """
+        ativ = _spider()._atividades(_resp(html))
+        assert ativ[0]["id"] != ativ[1]["id"]
+
+    def test_sem_atividades_retorna_lista_vazia(self):
+        html = '<div id="avaliacao-portal"><table><tbody></tbody></table></div>'
+        assert _spider()._atividades(_resp(html)) == []
+
+    def test_multiplas_atividades(self):
+        html = f"""
+        <div id="avaliacao-portal"><table><tbody>
+          {self._HTML_ALERTA.split('<tbody>')[1].split('</tbody>')[0]}
+          {self._HTML_NORMAL.split('<tbody>')[1].split('</tbody>')[0]}
+        </tbody></table></div>
+        """
+        ativ = _spider()._atividades(_resp(html))
+        assert len(ativ) == 2
+
+
+# ── Etapa 10: _parse_date ────────────────────────────────────────────────────
+
+class TestParseDate:
+    def test_formato_dd_mm_yyyy(self):
+        assert DiscenteSpider._parse_date("27/08/2026 - ") == "2026-08-27"
+
+    def test_apenas_a_data(self):
+        assert DiscenteSpider._parse_date("24/08/2026") == "2026-08-24"
+
+    def test_texto_sem_data_retorna_none(self):
+        assert DiscenteSpider._parse_date("sem data aqui") is None
+
+    def test_texto_vazio_retorna_none(self):
+        assert DiscenteSpider._parse_date("") is None
+
+
+# ── Etapa 11: _atualizacoes_turma ────────────────────────────────────────────
+
+class TestAtualizacoesTurma:
+    _HTML = """
+    <div id="atualizacoes-turma">
+      <div class="rotator">
+        <table>
+          <tr><td>27/08/2026 - <a href="#">INTELIGÊNCIA COMPUTACIONAL</a></td></tr>
+          <tr><td>Nova Notícia: Aula do dia 27/08/2026, quinta-feira.</td></tr>
+        </table>
+        <table>
+          <tr><td>24/08/2026 - <a href="#">ENGENHARIA DE SOFTWARE 1</a></td></tr>
+          <tr><td>Tarefa alterada.</td></tr>
+        </table>
+      </div>
+    </div>
+    """
+
+    _HTML_VAZIO = """
+    <div id="atualizacoes-turma"><div class="rotator"></div></div>
+    """
+
+    def _get(self):
+        return _spider()._atualizacoes_turma(_resp(self._HTML))
+
+    def test_quantidade_de_atualizacoes(self):
+        assert len(self._get()) == 2
+
+    def test_materia(self):
+        assert self._get()[0]["materia"] == "INTELIGÊNCIA COMPUTACIONAL"
+
+    def test_criacao_em_iso(self):
+        assert self._get()[0]["criacao"] == "2026-08-27"
+
+    def test_descricao(self):
+        assert self._get()[0]["descricao"] == "Nova Notícia: Aula do dia 27/08/2026, quinta-feira."
+
+    def test_id_e_string_hexadecimal(self):
+        id_val = self._get()[0]["id"]
+        assert isinstance(id_val, str)
+        int(id_val, 16)  # deve ser hex válido
+
+    def test_id_deterministico(self):
+        assert self._get()[0]["id"] == self._get()[0]["id"]
+
+    def test_ids_distintos_para_atualizacoes_distintas(self):
+        atualizacoes = self._get()
+        assert atualizacoes[0]["id"] != atualizacoes[1]["id"]
+
+    def test_sem_tabelas_retorna_lista_vazia(self):
+        assert _spider()._atualizacoes_turma(_resp(self._HTML_VAZIO)) == []
 
 
 # ── Etapa 7: parse (integração) ──────────────────────────────────────────────
@@ -274,6 +439,19 @@ class TestParse:
         assert item["ch_exigida"] == 3200
         assert item["ch_cursada"] == 800
 
+    def test_materias_e_lista(self):
+        item = list(_spider().parse(_resp(_PAGINA_VALIDA)))[0]
+        assert isinstance(item["materias"], list)
+
     def test_materias_extraidas(self):
         item = list(_spider().parse(_resp(_PAGINA_VALIDA)))[0]
-        assert "algoritmos-e-programacao" in item["materias"]
+        nomes = [m["nome"] for m in item["materias"]]
+        assert "Algoritmos e Programação" in nomes
+
+    def test_atividades_e_lista(self):
+        item = list(_spider().parse(_resp(_PAGINA_VALIDA)))[0]
+        assert isinstance(item["atividades"], list)
+
+    def test_atualizacoes_turma_e_lista(self):
+        item = list(_spider().parse(_resp(_PAGINA_VALIDA)))[0]
+        assert isinstance(item["atualizacoes_turma"], list)

@@ -1,12 +1,16 @@
 import re
-import unicodedata
+from datetime import date, datetime, timedelta, timezone
 
+import xxhash
 import scrapy
 from scrapy.exceptions import CloseSpider
 from scrapy.http import Response
 
 from app.scraper import USER_AGENT
 from app.scraper.items import DiscenteItem
+
+_TZ_BRT = timezone(timedelta(hours=-3))
+_ALERTA_IMG = "prova_semana.png"
 
 _SESSION_EXPIRED_MARKER = "alert('Sua sessão foi expirada. É necessário autenticar-se novamente!');"
 _PAGE_MARKERS = ["Componente Curricular", "Dados Institucionais", "Minhas atividades"]
@@ -47,23 +51,62 @@ class DiscenteSpider(scrapy.Spider):
             return None
 
     @staticmethod
-    def _slug(text: str) -> str:
-        text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
-        text = re.sub(r"[^\w\s-]", "", text.lower())
-        return re.sub(r"\s+", "-", text).strip("-")
+    def _parse_due(text: str) -> str | None:
+        m = re.search(r'(\d{2}/\d{2}/\d{4})\s+(\d{1,2}:\d{1,2})', text)
+        if not m:
+            return None
+        day, month, year = m.group(1).split("/")
+        h, mi = m.group(2).split(":")
+        dt = datetime(int(year), int(month), int(day), int(h), int(mi), tzinfo=_TZ_BRT)
+        return dt.isoformat()
 
-    def _materias(self, response: Response) -> dict:
+    def _atividades(self, response: Response) -> list:
+        rows = response.xpath('//div[@id="avaliacao-portal"]//tbody/tr')
+        result = []
+        for row in rows:
+            tipo = "alerta" if row.xpath(f'td[1]//img[contains(@src, "{_ALERTA_IMG}")]') else "normal"
+            due_raw = " ".join(row.xpath('td[2]//text()').getall())
+            due = self._parse_due(due_raw)
+            nome = row.xpath('td[3]/small//a/text()').get("").strip()
+            materia = row.xpath('(td[3]/small//text()[normalize-space()!=""])[1]').get("").strip()
+            hasher = xxhash.xxh3_128()
+            for part in (due or "", nome, materia):
+                hasher.update(part.encode())
+            result.append({"id": hasher.hexdigest(), "tipo": tipo, "due": due, "nome": nome, "materia": materia})
+        return result
+
+    @staticmethod
+    def _parse_date(text: str) -> str | None:
+        m = re.search(r'(\d{2})/(\d{2})/(\d{4})', text)
+        if not m:
+            return None
+        return date(int(m.group(3)), int(m.group(2)), int(m.group(1))).isoformat()
+
+    def _atualizacoes_turma(self, response: Response) -> list:
+        tables = response.xpath('//div[@id="atualizacoes-turma"]//div[@class="rotator"]/table')
+        result = []
+        for table in tables:
+            materia = table.xpath('normalize-space(.//tr[1]/td/a)').get("").strip()
+            criacao = self._parse_date(table.xpath('.//tr[1]/td/text()').get(""))
+            descricao = table.xpath('normalize-space(.//tr[2]/td)').get("").strip()
+            hasher = xxhash.xxh3_128()
+            for part in (materia, criacao or "", descricao):
+                hasher.update(part.encode())
+            result.append({"id": hasher.hexdigest(), "materia": materia, "criacao": criacao, "descricao": descricao})
+        return result
+
+    def _materias(self, response: Response) -> list:
         rows = response.xpath(
             '//th[normalize-space()="Componente Curricular"]'
             '/ancestor::table[1]//tbody/tr'
         )
-        result = {}
+        result = []
         for row in rows:
             nome = row.xpath('normalize-space(td[1]/form//a)').get("").strip()
             local = row.xpath('normalize-space(td[2])').get("").strip()
             horario = row.xpath('normalize-space(td[3]//center)').get("").strip()
             if nome:
-                result[self._slug(nome)] = {"nome": nome, "local": local, "horario": horario}
+                result.append({"nome": nome, "local": local, "horario": horario})
         return result
 
     def _indice(self, response: Response, title: str) -> str:
@@ -102,4 +145,6 @@ class DiscenteSpider(scrapy.Spider):
         discente["ch_exigida"] = int(v) if (v := response.xpath('//td[normalize-space()="CH. Exigida"]/following-sibling::td[1]/text()').get("").strip()).isdigit() else None
         discente["ch_cursada"] = int(v) if (v := response.xpath('//td[normalize-space()="CH. Cursada"]/following-sibling::td[1]/text()').get("").strip()).isdigit() else None
         discente["materias"] = self._materias(response)
+        discente["atividades"] = self._atividades(response)
+        discente["atualizacoes_turma"] = self._atualizacoes_turma(response)
         yield discente
