@@ -1,3 +1,5 @@
+.PHONY: dev fetch sigaa-me tests
+
 dev:
 	uvicorn app.main:app --reload
 
@@ -8,3 +10,5 @@ fetch:
 sigaa-me:
 	.venv/bin/python scripts/fetch_html.py "https://sigaa.sistemas.ufg.br/sigaa/portais/discente/discente.jsf" --cookies # Inserir cookie
 
+tests:
+	.venv/bin/pytest tests/ -v
