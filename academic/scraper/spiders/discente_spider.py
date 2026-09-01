@@ -6,8 +6,8 @@ import scrapy
 from scrapy.exceptions import CloseSpider
 from scrapy.http import Response
 
-from app.scraper import USER_AGENT
-from app.scraper.items import DiscenteItem
+from academic.scraper import USER_AGENT
+from academic.scraper.items import DiscenteItem
 
 _TZ_BRT = timezone(timedelta(hours=-3))
 _ALERTA_IMG = "prova_semana.png"
@@ -26,7 +26,7 @@ class DiscenteSpider(scrapy.Spider):
         "COOKIES_ENABLED": False,
         "USER_AGENT": USER_AGENT,
         "DOWNLOADER_MIDDLEWARES": {
-            "app.scraper.middlewares.RawCookieMiddleware": 100,
+            "academic.scraper.middlewares.RawCookieMiddleware": 100,
         },
     }
 

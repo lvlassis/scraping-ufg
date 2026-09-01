@@ -1,6 +1,6 @@
 from scrapy.crawler import Crawler
 
-from app.cache import store
+from academic.scraper import store
 
 
 class CachePipeline:

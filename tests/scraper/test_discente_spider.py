@@ -2,7 +2,7 @@ import pytest
 from scrapy.exceptions import CloseSpider
 from scrapy.http import HtmlResponse
 
-from app.scraper.spiders.discente_spider import (
+from academic.scraper.spiders.discente_spider import (
     DiscenteSpider,
     _PAGE_MARKERS,
     _SESSION_EXPIRED_MARKER,

@@ -1,19 +1,17 @@
 BOT_NAME = "turing"
 
-SPIDER_MODULES = ["app.scraper.spiders"]
-NEWSPIDER_MODULE = "app.scraper.spiders"
+SPIDER_MODULES = ["academic.scraper.spiders"]
+NEWSPIDER_MODULE = "academic.scraper.spiders"
 
 ROBOTSTXT_OBEY = True
 
-# Intervalo entre requisições (segundos) — evita sobrecarregar o servidor
 DOWNLOAD_DELAY = 1
 RANDOMIZE_DOWNLOAD_DELAY = True
 
 ITEM_PIPELINES = {
-    "app.scraper.pipelines.CachePipeline": 300,
+    "academic.scraper.pipelines.CachePipeline": 300,
 }
 
-# Cache HTTP: evita re-baixar páginas durante desenvolvimento
 HTTPCACHE_ENABLED = True
 HTTPCACHE_EXPIRATION_SECS = 3600
 HTTPCACHE_DIR = ".scrapy_cache"

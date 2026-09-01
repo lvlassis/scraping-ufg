@@ -1,5 +1,5 @@
-import app.cache.store as store_module
-from app.cache.store import get_data, set_data
+import academic.scraper.store as store_module
+from academic.scraper.store import get_data, set_data
 
 
 def setup_function():

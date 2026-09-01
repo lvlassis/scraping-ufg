@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from app.scraper.pipelines import CachePipeline
+from academic.scraper.pipelines import CachePipeline
 
 
 def _make_crawler(name: str = "discente", close_reason: str | None = None):
@@ -44,7 +44,7 @@ class TestCachePipeline:
         pipeline.open_spider()
         pipeline.process_item({"nome": "João"})
 
-        with patch("app.scraper.pipelines.store") as mock_store:
+        with patch("academic.scraper.pipelines.store") as mock_store:
             pipeline.close_spider()
             mock_store.set_data.assert_called_once_with(
                 "discente", [{"nome": "João"}], error=None
@@ -54,7 +54,7 @@ class TestCachePipeline:
         pipeline = CachePipeline.from_crawler(_make_crawler(close_reason="session_expired"))
         pipeline.open_spider()
 
-        with patch("app.scraper.pipelines.store") as mock_store:
+        with patch("academic.scraper.pipelines.store") as mock_store:
             pipeline.close_spider()
             mock_store.set_data.assert_called_once_with(
                 "discente", [], error="session_expired"
@@ -64,7 +64,7 @@ class TestCachePipeline:
         pipeline = CachePipeline.from_crawler(_make_crawler(close_reason="unexpected_page"))
         pipeline.open_spider()
 
-        with patch("app.scraper.pipelines.store") as mock_store:
+        with patch("academic.scraper.pipelines.store") as mock_store:
             pipeline.close_spider()
             mock_store.set_data.assert_called_once_with(
                 "discente", [], error="unexpected_page"

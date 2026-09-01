@@ -3,7 +3,6 @@ from datetime import datetime
 
 _lock = threading.Lock()
 
-# Estrutura: { "nome_do_spider": {"data": [...], "updated_at": datetime} }
 _store: dict = {}
 
 
