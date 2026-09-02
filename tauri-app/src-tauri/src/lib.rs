@@ -10,7 +10,11 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(ServerProcess(Mutex::new(None)))
         .setup(|app| {
-            let root = std::env::current_dir().unwrap();
+            // CARGO_MANIFEST_DIR = tauri-app/src-tauri; sobe dois níveis para a raiz do projeto
+            let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .parent().unwrap()
+                .parent().unwrap()
+                .to_path_buf();
             let python = root.join(".venv/bin/python");
             let server = root.join("server.py");
 

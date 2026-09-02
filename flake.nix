@@ -29,7 +29,6 @@
 
           # Node.js (Tauri CLI)
           nodejs
-          nodePackages.npm
 
           # Python
           python312
