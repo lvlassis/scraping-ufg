@@ -11,6 +11,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       craneLib = crane.mkLib pkgs;
+      py = pkgs.python312Packages;
 
       tauriSystemDeps = with pkgs; [
         webkitgtk_4_1
@@ -21,8 +22,19 @@
         glib-networking
       ];
 
+      # fastapi sem testes de install: o nixpkgs-unstable usa doInstallCheck=true
+      # com inline-snapshot 0.34.2 customizado, que tem 3 falhas de teste.
+      fastapi = py.fastapi.overrideAttrs (_: {
+        doCheck = false;
+        doInstallCheck = false;
+        nativeCheckInputs = [ ];
+        checkInputs = [ ];
+        nativeInstallCheckInputs = [ ];
+        installCheckInputs = [ ];
+      });
+
       # sigaa-scraper (dependência git, pinada pelo rev do HEAD)
-      sigaaScraper = pkgs.python312Packages.buildPythonPackage {
+      sigaaScraper = py.buildPythonPackage {
         pname = "sigaa-scraper";
         version = "0.1.0";
         pyproject = true;
@@ -32,22 +44,23 @@
           rev = "a4983a0fb3071b8282ed7b4da75fb593fb25cf2d";
           hash = "sha256-O8outK7nEdLpD3ldfY60yIZb6yhZmZQJ/41JEunvRGg=";
         };
-        build-system = [ pkgs.python312Packages.hatchling ];
-        dependencies = with pkgs.python312Packages; [ requests parsel xxhash ];
+        build-system = [ py.hatchling ];
+        dependencies = [ py.requests py.parsel py.xxhash ];
       };
 
       # sigaa-api como pacote Python puro
-      sigaaApiPkg = pkgs.python312Packages.buildPythonPackage {
+      sigaaApiPkg = py.buildPythonPackage {
         pname = "sigaa-api";
         version = "0.1.0";
         pyproject = true;
         src = ./sigaa-api;
-        build-system = [ pkgs.python312Packages.hatchling ];
-        dependencies = with pkgs.python312Packages; [ fastapi uvicorn sigaaScraper ];
+        build-system = [ py.hatchling ];
+        # fastapi explícito aponta para o let-binding sem testes
+        dependencies = [ fastapi py.uvicorn sigaaScraper ];
       };
 
       # Ambiente Python isolado com sigaa-api e todas suas deps
-      sigaaApiEnv = pkgs.python312.withPackages (_: [ sigaaApiPkg ]);
+      sigaaApiEnv = pkgs.python312.withPackages (_: [ sigaaApiPkg fastapi ]);
 
       # Binário sidecar: script shell que invoca uvicorn via Python do Nix store
       sigaaApi = pkgs.writeShellApplication {
