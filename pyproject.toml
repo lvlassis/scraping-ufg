@@ -1,21 +1,5 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.uv.workspace]
+members = ["sigaa-api", "sigaa-cli"]
 
-[project]
-name = "academic"
-version = "0.1.0"
-requires-python = ">=3.12"
-dependencies = [
-    "scrapy>=2.11.0",
-    "python-dotenv>=1.0.0",
-    "xxhash>=3.0.0",
-    "typer>=0.12.0",
-]
-
-[project.optional-dependencies]
-server = ["fastapi>=0.115.0", "uvicorn[standard]>=0.30.0"]
-dev = ["pytest"]
-
-[project.scripts]
-academic = "academic.cli.main:app"
+[tool.uv.sources]
+sigaa-scraper = { git = "https://github.com/lvlassis/sigaa-scraper.git" }
