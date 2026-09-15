@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from sigaa_scraper import SigaaScraper, SessionExpiredError, UnexpectedPageError
 
-app = FastAPI(title="Academic Server")
+app = FastAPI(title="Sigaa API")
 
 app.add_middleware(
     CORSMiddleware,
