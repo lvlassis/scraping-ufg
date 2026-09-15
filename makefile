@@ -7,6 +7,9 @@ fetch:
 	@test -n "$(URL)" || (echo "Uso: make fetch URL=https://exemplo.com [COOKIES='nome=valor; nome2=valor2']" && exit 1)
 	$(PYTHON) scripts/fetch_html.py "$(URL)" $(if $(COOKIES),--cookies "$(COOKIES)",)
 
+dev:
+	uvicorn sigaa_api.main:app --reload
+
 nix-api:
 	nix build .#sigaa-api
 

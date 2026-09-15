@@ -53,6 +53,12 @@
 
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [ python312 uv ];
+        shellHook = ''
+          if [ ! -d .venv ]; then
+            uv sync
+          fi
+          source .venv/bin/activate
+        '';
       };
     };
 }

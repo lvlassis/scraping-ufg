@@ -3,3 +3,5 @@ html_samples/
 .scrapy_cache/
 .env
 /.venv
+/.direnv
+/.direnv
