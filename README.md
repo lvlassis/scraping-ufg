@@ -1,10 +1,14 @@
-# SIGAA UFG API
+# SIGAA UFG Desktop
 
-API de web scraping para o SIGAA UFG, expondo dados acadêmicos via HTTP.
+Aplicativo desktop para o SIGAA UFG, construído com Tauri + Vue.js.
 
 ## Descrição
 
-O projeto é composto por uma API FastAPI (`sigaa-api/`) que faz scraping do SIGAA UFG usando a biblioteca [`sigaa-scraper`](https://github.com/lvlassis/sigaa-scraper), e um aplicativo desktop (`desktop-app/`) construído com Tauri que consome essa API.
+O projeto é composto por três módulos:
+
+- `sigaa-api/` — API FastAPI que faz scraping do SIGAA UFG usando [`sigaa-scraper`](https://github.com/lvlassis/sigaa-scraper), expondo dados acadêmicos via HTTP
+- `frontend/` — interface Vue.js (Vite) que consome a API
+- `desktop-app/` — shell Tauri (Rust) que empacota o frontend e sobe a API como processo filho
 
 A API recebe os cookies de sessão do SIGAA via query parameter e retorna os dados do discente em JSON.
 
@@ -44,8 +48,24 @@ Configurar os cookies de sessão no `.env` (ver `.env.example`):
 SIGAA_COOKIES=_ufg_br_sess=...; JSESSIONID=...
 ```
 
-### Desktop
+### Frontend
 
 ```bash
-make dev-desktop
+cd frontend
+npm install
+npm run dev     # Vite na porta 5173, com hot reload
 ```
+
+### Desktop
+
+Em dois terminais separados:
+
+```bash
+# terminal 1 — frontend
+cd frontend && npm run dev
+
+# terminal 2 — app Tauri (abre a janela apontando para o Vite)
+cd desktop-app && tauri dev
+```
+
+O Tauri também pode subir o Vite automaticamente via `beforeDevCommand` configurado em `tauri.conf.json`, bastando rodar apenas `tauri dev` no `desktop-app/`.
