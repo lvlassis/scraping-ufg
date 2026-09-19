@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { LayoutDashboard, BookOpen, ClipboardList, GraduationCap, Settings } from 'lucide-vue-next'
+import { LayoutDashboard, BookOpen, ClipboardList, GraduationCap, Settings, LogOut } from 'lucide-vue-next'
 import UserAvatar from './UserAvatar.vue'
 import type { Account } from '../types/api'
 
 defineProps<{ user: Account }>()
+defineEmits<{ logout: [] }>()
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Início', active: true },
@@ -37,10 +38,17 @@ const navItems = [
 
     <div class="p-4 border-t border-border flex items-center gap-3">
       <UserAvatar :nome="user.nome" size="sm" />
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <p class="text-xs font-medium text-foreground truncate">{{ user.nome }}</p>
         <p class="text-xs text-muted-foreground">{{ user.matricula }}</p>
       </div>
+      <button
+        @click="$emit('logout')"
+        class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        title="Sair"
+      >
+        <LogOut :size="15" />
+      </button>
     </div>
   </aside>
 </template>

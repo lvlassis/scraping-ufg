@@ -20,6 +20,12 @@ export function getDb(): Db {
   return _db
 }
 
+export function closeDb(): void {
+  _sqlite?.close()
+  _sqlite = null
+  _db = null
+}
+
 export function initDb(matricula: string): void {
   _sqlite?.close()
 

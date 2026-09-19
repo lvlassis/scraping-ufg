@@ -89,3 +89,6 @@ Previne condições de corrida: se `did-navigate` disparar múltiplas vezes (ex:
 | `src/renderer/src/views/AccountSelect.vue` | Seleção entre contas já conhecidas |
 | `src/main/model/accounts.ts` | Persiste lista de contas em `accounts.json` |
 | `src/main/db/index.ts` | Abre o banco SQLite isolado por matrícula |
+
+## Melhorias
+- [ ] Adicionar animação de "Startup" ao concluir o login e entrar no dashboard principal, como um "fade in" ou um "esmaecer".

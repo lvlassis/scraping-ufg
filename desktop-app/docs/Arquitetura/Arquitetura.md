@@ -9,3 +9,4 @@
 - [[Banco de dados local]]
 ## Fluxos
 - [[Fluxo de Login]]
+- [[Fluxo de Logout]]

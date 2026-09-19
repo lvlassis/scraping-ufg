@@ -23,3 +23,8 @@ export function upsertAccount(account: Account): void {
   else accounts.push(account)
   writeFileSync(getPath(), JSON.stringify(accounts))
 }
+
+export function removeAccount(matricula: string): void {
+  const accounts = getAccounts().filter((a) => a.matricula !== matricula)
+  writeFileSync(getPath(), JSON.stringify(accounts))
+}

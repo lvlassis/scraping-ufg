@@ -3,5 +3,5 @@
 - [[Problemas]]
 - [[Filosofia]]
 - [[Desafios]]
-- [[Arquitetura]]
 - [[Requisitos]]
+- [[Arquitetura]]

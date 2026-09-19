@@ -1,8 +1,9 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import { rmSync } from 'fs'
 import { spawn, ChildProcess } from 'child_process'
-import { initDb } from './db'
-import { getAccounts, upsertAccount, type Account } from './model/accounts'
+import { initDb, closeDb, getDataDir } from './db'
+import { getAccounts, upsertAccount, removeAccount, type Account } from './model/accounts'
 import { getMateriasPorSemestre, insertMaterias, updateMaterias, type ApiMateria } from './model/materia'
 
 const SIGAA_LOGIN_URL = 'https://sigaa.sistemas.ufg.br/sigaa/verTelaLogin.do'
@@ -123,6 +124,16 @@ app.whenReady().then(() => {
 
   ipcMain.handle('materia:update', (_, cookies: string) => updateMaterias(cookies))
   ipcMain.handle('materia:getBySemestre', (_, semestre: string) => getMateriasPorSemestre(semestre))
+
+  ipcMain.handle('auth:logout', (): void => {
+    closeDb()
+  })
+
+  ipcMain.handle('auth:removeAccount', (_, matricula: string): void => {
+    closeDb()
+    try { rmSync(join(getDataDir(), `${matricula}.sqlite`)) } catch {}
+    removeAccount(matricula)
+  })
 
   if (app.isPackaged) startSigaaApi()
   createWindow()
