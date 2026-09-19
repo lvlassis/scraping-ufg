@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  /* Fundo e superfícies */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(224, 15%, 12%);
+
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(224, 15%, 12%);
+
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(224, 15%, 12%);
+
+  /* Azul UFG */
+  --primary: hsl(211, 100%, 24%);
+  --primary-foreground: hsl(0, 0%, 100%);
+
+  /* Cinza claro para ações secundárias */
+  --secondary: hsl(220, 14%, 97%);
+  --secondary-foreground: hsl(224, 15%, 12%);
+
+  /* Áreas silenciosas */
+  --muted: hsl(220, 14%, 97%);
+  --muted-foreground: hsl(213, 11%, 65%);
+
+  /* Destaque leve (azul bem claro) */
+  --accent: hsl(217, 75%, 95%);
+  --accent-foreground: hsl(211, 100%, 24%);
+
+  /* Estados */
+  --destructive: hsl(0, 74%, 42%);
+  --success: hsl(148, 65%, 29%);
+  --warning: hsl(27, 91%, 37%);
+
+  /* Estrutura */
+  --border: hsl(218, 13%, 90%);
+  --input: hsl(218, 13%, 90%);
+  --ring: hsl(211, 100%, 24%);
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}

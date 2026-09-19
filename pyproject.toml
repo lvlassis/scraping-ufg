@@ -1,5 +1,0 @@
-[tool.uv.workspace]
-members = ["sigaa-api", "sigaa-cli"]
-
-[tool.uv.sources]
-sigaa-scraper = { git = "https://github.com/lvlassis/sigaa-scraper.git" }

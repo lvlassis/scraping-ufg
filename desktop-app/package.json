@@ -1,12 +1,52 @@
 {
-  "name": "tauri-app",
-  "private": true,
+  "name": "sigaa-desktop",
   "version": "0.1.0",
-  "type": "module",
+  "private": true,
+  "main": "./out/main/index.js",
   "scripts": {
-    "tauri": "tauri"
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "electron-builder"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2"
+    "@electron/rebuild": "^4.2.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.2",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "drizzle-kit": "^0.31.10",
+    "electron": "^32.0.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.4.5",
+    "vue": "^3.4.0"
+  },
+  "build": {
+    "appId": "com.okabe.sigaa-desktop",
+    "productName": "Sigaa Desktop",
+    "linux": {
+      "target": "AppImage"
+    },
+    "extraResources": [
+      {
+        "from": "../sigaa-api-bin/sigaa-api",
+        "to": "sigaa-api"
+      },
+      {
+        "from": "src/main/db/migrations",
+        "to": "migrations"
+      }
+    ]
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "lucide-vue-next": "^1.0.0",
+    "reka-ui": "^2.10.4",
+    "tailwind-merge": "^3.7.0",
+    "tw-animate-css": "^1.4.0"
   }
 }
