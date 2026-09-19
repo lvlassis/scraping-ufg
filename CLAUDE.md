@@ -2,62 +2,82 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Modules
+
+The repo has two independent modules:
+
+- **`sigaa-api/`** — FastAPI server that wraps the [`sigaa-scraper`](https://github.com/lvlassis/sigaa-scraper) library (Python, manages its own `.venv` via `uv`)
+- **`desktop-app/`** — Electron + Vue 3 app that embeds the API binary (TypeScript/Node)
+
 ## Commands
 
+### sigaa-api
+
 ```bash
-make dev          # inicia o servidor FastAPI com hot-reload
-make fetch URL=https://exemplo.com [COOKIES='nome=valor; nome2=valor2']
-                  # faz HTTP fetch de uma URL e salva o HTML em html_samples/
+cd sigaa-api
+make dev          # uv run uvicorn sigaa_api.main:app --reload --host 127.0.0.1 --port 8765
+
+# Fetch a page and save its HTML for selector development (uses urllib, not the scraper)
+uv run python scripts/fetch_html.py <URL> [--cookies '_ufg_br_sess=...; JSESSIONID=...']
 ```
 
-Testar seletores XPath/CSS contra um HTML salvo localmente (sem fazer request):
+### desktop-app
+
 ```bash
-.venv/bin/scrapy shell html_samples/arquivo.html
+cd desktop-app
+make dev          # electron-vite dev (hot-reload for renderer; restarts main on change)
+make build        # electron-vite build
+make dist         # electron-builder → AppImage in dist/
+make clear        # delete all local data in ~/.local/share/sigaa-desktop/
+
+# DB schema changes
+npx drizzle-kit generate   # generate migration from schema change
+npx drizzle-kit migrate    # apply migrations locally (dev only)
 ```
 
-## Arquitetura
+### Build & packaging
 
-O projeto expõe uma API FastAPI que entrega dados via web scraping do SIGAA UFG.
+The electron-builder config (`desktop-app/package.json` `build` key) expects the compiled API binary at `../sigaa-api-bin/sigaa-api`. Build it first:
 
-**Fluxo de dados:**
-1. Rota FastAPI recebe request → extrai cookies de `X-SIGAA-Cookies` header ou `SIGAA_COOKIES` do `.env`
-2. Instancia o spider e chama `run_spider_in_thread()` → `thread.join()` (bloqueante)
-3. Spider roda via `CrawlerProcess` em thread separada (o Twisted emite warnings de signal handler mas funciona)
-4. `CachePipeline` coleta os items e os salva em `store` (dict em memória, chaveado por `spider.name`)
-5. Rota lê `store.get_data(spider.name)` e retorna o resultado
-
-**Spiders autenticadas no SIGAA:**
-
-O Twisted (engine HTTP do Scrapy) formata requests de forma que o SIGAA rejeita como bot (redirect 302 → `expirada.jsp`). A solução está em `app/scraper/middlewares.py`:
-
-- `RawCookieMiddleware` injeta o Cookie header como string raw em `process_request`, cobrindo tanto o request original quanto qualquer request criado pelo `RedirectMiddleware` ao seguir redirects
-- Todo spider autenticado deve usar estas `custom_settings`:
-
-```python
-custom_settings = {
-    "HTTPCACHE_ENABLED": False,   # nunca usar cache de sessão anterior
-    "ROBOTSTXT_OBEY": False,      # evita request extra que pode trigger detecção de bot
-    "COOKIES_ENABLED": False,     # desabilita CookiesMiddleware (transforma valores URL-encoded)
-    "USER_AGENT": "Mozilla/5.0 ...",
-    "DOWNLOADER_MIDDLEWARES": {
-        "app.scraper.middlewares.RawCookieMiddleware": 100,
-    },
-}
+```bash
+nix build .#sigaa-api        # output at ./result/bin/sigaa-api
+cp result/bin/sigaa-api sigaa-api-bin/sigaa-api
+cd desktop-app && make dist
 ```
 
-- O spider deve expor `self._raw_cookies: str` (string raw do header Cookie)
-- **Não usar** `cookies=dict` no `scrapy.Request` — o `CookiesMiddleware` decodifica valores URL-encoded (`%3D%3D` → `==`), quebrando o HMAC do `_ufg_br_sess`
-- **Não usar** `headers={"Cookie": ...}` com `dont_merge_cookies=True` — o header não é propagado para requests criados por redirect
+## Dev environment
 
-**Cookies SIGAA:**
+Uses [Nix](https://nixos.org/) with flakes + [direnv](https://direnv.net/). The repo defines two dev shells:
 
-O SIGAA exige dois cookies juntos: `_ufg_br_sess` (sessão Rails) e `JSESSIONID` (sessão Java/JSF). Configurar no `.env`:
-```
-SIGAA_COOKIES=_ufg_br_sess=...; JSESSIONID=...
-```
+- `nix develop .#sigaa-api` — Python 3.12 + uv (activated automatically via `sigaa-api/.envrc`)
+- `nix develop .#desktop-app` — Node 22 + Electron with the correct `ELECTRON_OVERRIDE_DIST_PATH` and `LD_LIBRARY_PATH` set
 
-As rotas leem de `X-SIGAA-Cookies` header (não `Cookie`) para não conflitar com cookies de localhost enviados pelo browser durante desenvolvimento.
+Enter the right shell before working in each module.
 
-**Ferramenta de fetch para desenvolvimento:**
+## Architecture
 
-`scripts/fetch_html.py` usa urllib diretamente (não Scrapy) para salvar HTML em `html_samples/`. Útil para inspecionar a estrutura da página antes de escrever seletores.
+### sigaa-api
+
+A thin FastAPI wrapper with two endpoints:
+
+- `GET /health` — liveness check
+- `POST /update?cookies=<raw-cookie-string>` — calls `SigaaScraper(cookies).get_discente()` from the external `sigaa-scraper` library and returns `{ matricula, nome, materias[] }`
+
+Errors: `401` on `SessionExpiredError`, `502` on `UnexpectedPageError`. All scraping logic lives in `sigaa-scraper`; this repo does not contain spider code.
+
+### desktop-app
+
+**Main process** (`src/main/index.ts`):
+- In packaged mode, spawns `sigaa-api` binary from `process.resourcesPath`
+- In dev mode, assumes `sigaa-api` is already running on port 8765
+- Opens a `BrowserWindow` with `partition: 'sigaa-login'` for the SIGAA login flow, waits for navigation to `/portais/discente/discente.jsf`, then extracts cookies via `session.cookies.get()`
+- Handles all IPC channels: `auth:*` and `materia:*`
+
+**Preload** (`src/preload/index.ts`): exposes `window.api` to the renderer via `contextBridge`.
+
+**Renderer** (`src/renderer/src/`): Vue 3, no router. `App.vue` manages a state machine: `loading → login | select-account → dashboard`. All backend calls go through `window.api`.
+
+**Data persistence**:
+- Per-account SQLite at `~/.local/share/sigaa-desktop/{matricula}.sqlite` — managed by Drizzle ORM (`src/main/db/`)
+- Account list at `~/.local/share/sigaa-desktop/accounts.json` — plain JSON read/written by `src/main/model/accounts.ts`
+- Migrations in `src/main/db/migrations/` are run on `initDb()` and bundled into the AppImage under `resources/migrations/`

@@ -3,6 +3,7 @@
 - Rascunho: [[Sigaa API]]
 Quero resolver os seguintes problemas:
 1. Como o usuário pode evitar de fazer login no Sigaa?
+    - [[Fluxo de Login]]
 2. Quais matérias estou fazendo? 
 3. Onde é a sala de cada matéria? 
 4. Quando é o horário de cada matéria? 
