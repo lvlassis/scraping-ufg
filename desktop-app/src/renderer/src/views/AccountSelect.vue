@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { UserRound, Plus } from 'lucide-vue-next'
+import { Plus } from 'lucide-vue-next'
+import UserAvatar from '../components/UserAvatar.vue'
 import type { Account } from '../types/api'
 
 defineProps<{ accounts: Account[] }>()
@@ -29,9 +30,7 @@ async function handleSelect(account: Account): Promise<void> {
         @click="handleSelect(account)"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-background hover:bg-secondary transition-colors text-left"
       >
-        <div class="w-9 h-9 rounded-full bg-accent flex items-center justify-center shrink-0">
-          <UserRound :size="16" class="text-accent-foreground" />
-        </div>
+        <UserAvatar :nome="account.nome" size="md" />
         <div class="min-w-0">
           <p class="text-sm font-medium text-foreground truncate">{{ account.nome }}</p>
           <p class="text-xs text-muted-foreground">{{ account.matricula }}</p>
