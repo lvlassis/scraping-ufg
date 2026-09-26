@@ -4,7 +4,7 @@ import { rmSync } from 'fs'
 import { spawn, ChildProcess } from 'child_process'
 import { initDb, closeDb, getDataDir } from './db'
 import { getAccounts, upsertAccount, removeAccount, type Account } from './model/accounts'
-import { getMateriasPorSemestre, insertMaterias, updateMaterias, type ApiMateria } from './model/materia'
+import { getMateriasPorSemestre, insertMaterias, insertAtividades, updateMaterias, getAtividadesPorMateria, getSemestreAtual, type ApiMateria, type ApiAtividade } from './model/materia'
 
 const SIGAA_LOGIN_URL = 'https://sigaa.sistemas.ufg.br/sigaa/verTelaLogin.do'
 const SIGAA_PORTAL_PATH = '/portais/discente/discente.jsf'
@@ -97,11 +97,13 @@ async function performLogin(cookies: string): Promise<Account> {
     throw new Error((body as { detail?: string }).detail ?? `HTTP ${res.status}`)
   }
 
-  const data = (await res.json()) as { matricula: string; nome: string; materias: ApiMateria[] }
+  const data = (await res.json()) as { matricula: string; nome: string; materias: ApiMateria[]; atividades: ApiAtividade[] }
 
   initDb(data.matricula)
   upsertAccount({ matricula: data.matricula, nome: data.nome })
+  const semestre = getSemestreAtual()
   insertMaterias(data.materias)
+  insertAtividades(data.atividades ?? [], semestre)
 
   return { matricula: data.matricula, nome: data.nome }
 }
@@ -124,6 +126,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('materia:update', (_, cookies: string) => updateMaterias(cookies))
   ipcMain.handle('materia:getBySemestre', (_, semestre: string) => getMateriasPorSemestre(semestre))
+  ipcMain.handle('materia:getAtividades', (_, materiaNome: string, semestre: string) => getAtividadesPorMateria(materiaNome, semestre))
 
   ipcMain.handle('auth:logout', (): void => {
     closeDb()

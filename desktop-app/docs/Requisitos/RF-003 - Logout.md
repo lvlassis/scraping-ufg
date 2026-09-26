@@ -19,3 +19,4 @@ Usuário necessíta de formas de fazer logout normal e de logout apagando seus d
     - Checkbox "Apagar dados salvos da conta"
 - [x] Adicionar botão de Opções nas contas já logadas. Opções:
     - Remover conta
+- [ ] Trocar cor do texto do botão de "Sair" para branco.

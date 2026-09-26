@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import MateriasCard from '../components/dashboard/MateriasCard.vue'
 import PerfilCard from '../components/dashboard/PerfilCard.vue'
 import UpdatePanel from '../components/dashboard/UpdatePanel.vue'
+import DashboardMateria from './DashboardMateria.vue'
 import type { Account, Materia } from '../types/api'
 
 const props = defineProps<{ user: Account }>()
@@ -16,6 +17,7 @@ function getSemestreAtual(): string {
 
 const semestre = getSemestreAtual()
 const materias = ref<Materia[]>([])
+const selectedMateria = ref<Materia | null>(null)
 
 async function carregarMaterias(): Promise<void> {
   materias.value = await window.api.getMateriasPorSemestre(semestre)
@@ -25,7 +27,14 @@ onMounted(carregarMaterias)
 </script>
 
 <template>
-  <div class="p-6">
+  <DashboardMateria
+    v-if="selectedMateria"
+    :materia="selectedMateria"
+    :semestre="semestre"
+    @back="selectedMateria = null"
+  />
+
+  <div v-else class="p-6">
     <div class="mb-5">
       <h1 class="text-xl font-semibold text-foreground">Início</h1>
       <p class="text-sm text-muted-foreground">{{ semestre }}</p>
@@ -35,7 +44,7 @@ onMounted(carregarMaterias)
 
     <div class="grid grid-cols-3 gap-4">
       <div class="col-span-2">
-        <MateriasCard :materias="materias" :semestre="semestre" />
+        <MateriasCard :materias="materias" :semestre="semestre" @select="selectedMateria = $event" />
       </div>
       <div class="col-span-1">
         <PerfilCard :user="props.user" :semestre="semestre" />

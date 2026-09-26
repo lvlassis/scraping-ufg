@@ -26,3 +26,5 @@ Quero resolver os seguintes problemas:
 21. Qual o contato da secretaria?
 22. Como me comunicar com a secretaria? 
 23. Quais as notícias e eventos importantes?
+24. Quero poder acessar o Sigaa pelo celular com facilidade
+25. Onde é que fica a minha sala de aula?

@@ -26,6 +26,7 @@
   --color-accent-foreground: var(--accent-foreground);
 
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-warning: var(--warning);
 
@@ -74,6 +75,7 @@
 
   /* Estados */
   --destructive: hsl(0, 74%, 42%);
+  --destructive-foreground: hsl(0, 0%, 100%);
   --success: hsl(148, 65%, 29%);
   --warning: hsl(27, 91%, 37%);
 

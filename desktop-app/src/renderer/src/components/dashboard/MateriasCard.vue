@@ -7,6 +7,8 @@ defineProps<{
   materias: Materia[]
   semestre: string
 }>()
+
+const emit = defineEmits<{ select: [materia: Materia] }>()
 </script>
 
 <template>
@@ -24,7 +26,7 @@ defineProps<{
       </div>
 
       <div v-else class="space-y-2">
-        <MateriaItem v-for="m in materias" :key="m.id" :materia="m" />
+        <MateriaItem v-for="m in materias" :key="m.id" :materia="m" @select="emit('select', $event)" />
       </div>
     </div>
   </div>

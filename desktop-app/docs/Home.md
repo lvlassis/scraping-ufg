@@ -4,4 +4,5 @@
 - [[Filosofia]]
 - [[Desafios]]
 - [[Requisitos]]
+- [[Bugs]]
 - [[Arquitetura]]

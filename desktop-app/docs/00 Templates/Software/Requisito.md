@@ -2,8 +2,8 @@
 
 - **Status:** Planejado 
 - **Tipo:** Funcional 
-- **Data de Criação:** 2024-01-15
-- **Última Atualização:** 2024-02-20
+- **Data de Criação:** {{date}}
+- **Última Atualização:** {{date}}
 
 ## Descrição
 _Descreva o requisito_

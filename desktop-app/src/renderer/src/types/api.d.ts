@@ -11,6 +11,15 @@ export type Materia = {
   semestre: string
 }
 
+export type Atividade = {
+  id: string
+  tipo: string
+  due: string | null
+  nome: string
+  materia_nome: string
+  semestre: string
+}
+
 declare global {
   interface Window {
     api: {
@@ -22,6 +31,7 @@ declare global {
       removeAccount(matricula: string): Promise<void>
       updateMaterias(cookies: string): Promise<void>
       getMateriasPorSemestre(semestre: string): Promise<Materia[]>
+      getAtividadesPorMateria(materiaNome: string, semestre: string): Promise<Atividade[]>
     }
   }
 }

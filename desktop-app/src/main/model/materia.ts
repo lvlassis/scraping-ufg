@@ -1,14 +1,23 @@
 import { createHash } from 'crypto'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { getDb } from '../db'
-import { materia } from '../db/schema'
+import { materia, atividade } from '../db/schema'
 
 export type Materia = typeof materia.$inferSelect
+export type Atividade = typeof atividade.$inferSelect
 
 export type ApiMateria = {
   nome: string
   local: string
   horario: string
+}
+
+export type ApiAtividade = {
+  id: string
+  tipo: string
+  due: string | null
+  nome: string
+  materia: string
 }
 
 export function getSemestreAtual(): string {
@@ -45,10 +54,33 @@ export async function updateMaterias(cookies: string): Promise<void> {
     throw new Error((body as { detail?: string }).detail ?? `HTTP ${response.status}`)
   }
 
-  const data = (await response.json()) as { materias: ApiMateria[] }
+  const data = (await response.json()) as { materias: ApiMateria[]; atividades: ApiAtividade[] }
+  const semestre = getSemestreAtual()
   insertMaterias(data.materias)
+  insertAtividades(data.atividades ?? [], semestre)
 }
 
 export function getMateriasPorSemestre(semestre: string): Materia[] {
   return getDb().select().from(materia).where(eq(materia.semestre, semestre)).all()
+}
+
+export function insertAtividades(atividades: ApiAtividade[], semestre: string): void {
+  if (atividades.length === 0) return
+  const rows = atividades.map((a) => ({
+    id: a.id,
+    tipo: a.tipo,
+    due: a.due ?? null,
+    nome: a.nome,
+    materia_nome: a.materia,
+    semestre,
+  }))
+  getDb().insert(atividade).values(rows).onConflictDoNothing().run()
+}
+
+export function getAtividadesPorMateria(materiaNome: string, semestre: string): Atividade[] {
+  return getDb()
+    .select()
+    .from(atividade)
+    .where(and(eq(atividade.materia_nome, materiaNome), eq(atividade.semestre, semestre)))
+    .all()
 }

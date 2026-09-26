@@ -6,43 +6,43 @@ Componente que realiza a raspagem dos dados do Sigaa e disponibiliza de forma es
 
 ## Responsabilidades Principais
 - Raspar do Sigaa:
-    - Lista de Matérias:
-        - Nome da Matéria
-        - Sala
-        - Horário
-        - Professor
-            - Nome
-            - Email
-        - Suas Notas
-        - Sua Frequência
-            - Número de faltas
-            - Dias que faltou
-    - Lista de Atividades:
-        - Nome da Atividade
-        - Dia de Entrega
-        - Matéria
-    - Lista de Materiais enviados pelo Professor:
-        - Nome do Material
-        - Link p/ Download
-    - Lista de Atualizações:
-        - Nome da Atualização
-        - Descrição
-        - Data de Publicação
-    - Metadados do Aluno:
-        - Nome
-        - Matricula
-        - Email
-        - Nível
-        - Curso
-        - Entrada
-        - Status
-        - IP
-        - TA
-        - TI
-        - MGE
-        - MRE
-        - QR (Reprovações por falta)
-        - PMF (Percentual Médio de Frequência)
+    - [ ] Lista de Matérias:
+        - [ ] Nome da Matéria
+        - [ ] Sala
+        - [ ] Horário
+        - [ ] Professor
+            - [ ] Nome
+            - [ ] Email
+        - [ ] Suas Notas
+        - [ ] Sua Frequência
+            - [ ] Número de faltas
+            - [ ] Dias que faltou
+    - [ ] Lista de Atividades:
+        - [ ] Nome da Atividade
+        - [ ] Dia de Entrega
+        - [ ] Matéria
+    - [ ] Lista de Materiais enviados pelo Professor:
+        - [ ] Nome do Material
+        - [ ] Link p/ Download
+    - [ ] Lista de Atualizações:
+        - [ ] Nome da Atualização
+        - [ ] Descrição
+        - [ ] Data de Publicação
+    - [ ] Metadados do Aluno:
+        - [ ] Nome
+        - [ ] Matricula
+        - [ ] Email
+        - [ ] Nível
+        - [ ] Curso
+        - [ ] Entrada
+        - [ ] Status
+        - [ ] IP
+        - [ ] TA
+        - [ ] TI
+        - [ ] MGE
+        - [ ] MRE
+        - [ ] QR (Reprovações por falta)
+        - [ ] PMF (Percentual Médio de Frequência)
 
 ## Entradas
 - Cookie de sessão funcional

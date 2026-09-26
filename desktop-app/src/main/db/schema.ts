@@ -10,3 +10,15 @@ export const materia = sqliteTable(
   },
   (t) => [uniqueIndex('materia_id_idx').on(t.id)]
 )
+
+export const atividade = sqliteTable(
+  'atividade', {
+    id: text('id').notNull(),
+    tipo: text('tipo').notNull(),
+    due: text('due'),
+    nome: text('nome').notNull(),
+    materia_nome: text('materia_nome').notNull(),
+    semestre: text('semestre').notNull(),
+  },
+  (t) => [uniqueIndex('atividade_id_idx').on(t.id)]
+)

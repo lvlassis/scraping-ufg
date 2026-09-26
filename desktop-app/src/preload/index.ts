@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld('api', {
   removeAccount: (matricula: string) => ipcRenderer.invoke('auth:removeAccount', matricula),
   updateMaterias: (cookies: string) => ipcRenderer.invoke('materia:update', cookies),
   getMateriasPorSemestre: (semestre: string) => ipcRenderer.invoke('materia:getBySemestre', semestre),
+  getAtividadesPorMateria: (materiaNome: string, semestre: string) => ipcRenderer.invoke('materia:getAtividades', materiaNome, semestre),
 })
