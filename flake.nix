@@ -44,10 +44,9 @@
           mkdir -p $out/lib/sigaa-desktop
           cp -r . $out/lib/sigaa-desktop/
 
-          # prebuilds/ contém binários pré-compilados do npm para múltiplas plataformas
-          # (incluindo musl) que não são usados em runtime — electron-rebuild compilou
-          # o binário correto em build/Release/
-          rm -rf $out/lib/sigaa-desktop/node_modules/better-sqlite3/prebuilds
+          # remove apenas o binário musl que autoPatchelf não consegue resolver
+          # em NixOS glibc — linux-x64.node é o que será usado em runtime
+          rm -f $out/lib/sigaa-desktop/node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node
 
           mkdir -p $out/bin
           makeWrapper ${pkgs.electron}/bin/electron $out/bin/sigaa-desktop \
