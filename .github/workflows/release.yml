@@ -38,9 +38,10 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME}"
           DIRNAME="sigaa-desktop-${VERSION}"
-          mkdir -p "${DIRNAME}/node_modules"
+          npm prune --omit=dev
+          mkdir -p "${DIRNAME}"
           cp -r out "${DIRNAME}/"
-          cp -r node_modules/better-sqlite3 "${DIRNAME}/node_modules/"
+          cp -r node_modules "${DIRNAME}/"
           cp -r src/main/db/migrations "${DIRNAME}/migrations"
           cp package.json "${DIRNAME}/"
           tar -czf "sigaa-desktop-${VERSION}-linux-app.tar.gz" "${DIRNAME}"
