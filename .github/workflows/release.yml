@@ -25,6 +25,13 @@ jobs:
       - name: Install build dependencies
         run: sudo apt-get install -y libarchive-tools
 
+      - name: Download sigaa-scraper
+        run: |
+          mkdir -p resources
+          curl -L -o resources/sigaa-scraper \
+            https://github.com/lvlassis/sigaa-scraper/releases/latest/download/sigaa-scraper-linux-x86_64
+          chmod +x resources/sigaa-scraper
+
       - name: Rebuild native modules
         run: npx electron-rebuild -f -w better-sqlite3
 
@@ -43,6 +50,7 @@ jobs:
           cp -r out "${DIRNAME}/"
           cp -r node_modules "${DIRNAME}/"
           cp -r src/main/db/migrations "${DIRNAME}/migrations"
+          cp resources/sigaa-scraper "${DIRNAME}/sigaa-scraper"
           cp package.json "${DIRNAME}/"
           tar -czf "sigaa-desktop-${VERSION}-linux-app.tar.gz" "${DIRNAME}"
 
@@ -82,6 +90,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Download sigaa-scraper
+        run: |
+          mkdir resources
+          curl -L -o resources/sigaa-scraper.exe `
+            https://github.com/lvlassis/sigaa-scraper/releases/latest/download/sigaa-scraper-windows-x86_64.exe
 
       - name: Rebuild native modules
         run: npx electron-rebuild -f -w better-sqlite3

@@ -31,10 +31,16 @@
     "appId": "com.okabe.sigaa-desktop",
     "productName": "Sigaa Desktop",
     "linux": {
-      "target": ["AppImage", "deb", "rpm", "pacman"]
+      "target": ["AppImage", "deb", "rpm", "pacman"],
+      "extraResources": [
+        { "from": "resources/sigaa-scraper", "to": "sigaa-scraper" }
+      ]
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "extraResources": [
+        { "from": "resources/sigaa-scraper.exe", "to": "sigaa-scraper.exe" }
+      ]
     },
     "nsis": {
       "oneClick": false,

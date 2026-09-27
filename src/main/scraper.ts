@@ -1,9 +1,21 @@
 import { spawn } from 'child_process'
+import { app } from 'electron'
+import { join } from 'path'
 import type { ApiResponse } from './model/materia'
+
+function getScraperBin(): string {
+  if (process.env.SIGAA_SCRAPER_PATH) return process.env.SIGAA_SCRAPER_PATH
+  if (app.isPackaged)
+    return join(
+      process.resourcesPath,
+      process.platform === 'win32' ? 'sigaa-scraper.exe' : 'sigaa-scraper'
+    )
+  return 'sigaa-scraper'
+}
 
 export function callScraper(cookies: string): Promise<ApiResponse> {
   return new Promise((resolve, reject) => {
-    const proc = spawn('sigaa-scraper', ['discente'], { stdio: ['pipe', 'pipe', 'pipe'] })
+    const proc = spawn(getScraperBin(), ['discente'], { stdio: ['pipe', 'pipe', 'pipe'] })
 
     let stdout = ''
     let stderr = ''
