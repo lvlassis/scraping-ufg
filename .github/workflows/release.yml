@@ -25,7 +25,10 @@ jobs:
       - name: Rebuild native modules
         run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Build and package
+      - name: Build
+        run: npm run build
+
+      - name: Package
         run: npx electron-builder --linux --publish never
 
       - name: Create NixOS tarball
@@ -78,7 +81,10 @@ jobs:
       - name: Rebuild native modules
         run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Build and package
+      - name: Build
+        run: npm run build
+
+      - name: Package
         run: npx electron-builder --win --publish never
 
       - uses: actions/upload-artifact@v4
