@@ -2,6 +2,52 @@
 
 Aplicativo desktop para o SIGAA UFG, construído com Electron + Vue 3.
 
+## Instalação
+
+Baixe o instalador correspondente ao seu sistema na [página de releases](https://github.com/lvlassis/scraping-ufg/releases/latest).
+
+### Ubuntu / Debian
+
+```bash
+sudo apt install ./sigaa-desktop_*_amd64.deb
+```
+
+### RHEL / Fedora
+
+```bash
+sudo dnf install ./sigaa-desktop-*.x86_64.rpm
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -U sigaa-desktop-*.pacman
+```
+
+### NixOS
+
+Adicione como input no seu `flake.nix`:
+
+```nix
+inputs.sigaa-desktop.url = "github:lvlassis/scraping-ufg";
+```
+
+E inclua no seu `home.packages` (home-manager) ou `environment.systemPackages`:
+
+```nix
+inputs.sigaa-desktop.packages.x86_64-linux.default
+```
+
+Ou instale diretamente no perfil:
+
+```bash
+nix profile install github:lvlassis/scraping-ufg
+```
+
+### Windows
+
+Baixe o arquivo `Sigaa-Desktop-*-Setup.exe` e execute o instalador.
+
 ## Estrutura
 
 - `sigaa-api/` — servidor FastAPI que expõe os dados do SIGAA via HTTP, usando a biblioteca [`sigaa-scraper`](https://github.com/lvlassis/sigaa-scraper)
