@@ -45,7 +45,7 @@
           cp -r . $out/lib/sigaa-desktop/
 
           mkdir -p $out/bin
-          makeWrapper ${pkgs.electron_32}/bin/electron $out/bin/sigaa-desktop \
+          makeWrapper ${pkgs.electron_35}/bin/electron $out/bin/sigaa-desktop \
             --add-flags "$out/lib/sigaa-desktop/out/main/index.js"
 
           mkdir -p $out/share/applications
