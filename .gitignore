@@ -1,18 +1,5 @@
-# Python
-__pycache__/
-*.pyc
-.env
-.venv/
-
-# Scrapy / ferramentas de desenvolvimento
-html_samples/
-.scrapy_cache/
-
-# Nix
-result
-result-*
+node_modules/
+out/
+dist/
 .direnv/
-
-# OS
-.DS_Store
-/desktop-app/docs/.obsidian
+/docs/.obsidian

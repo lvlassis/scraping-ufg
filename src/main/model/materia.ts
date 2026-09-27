@@ -2,6 +2,7 @@ import { createHash } from 'crypto'
 import { and, eq } from 'drizzle-orm'
 import { getDb } from '../db'
 import { materia, atividade } from '../db/schema'
+import { callScraper } from '../scraper'
 
 export type Materia = typeof materia.$inferSelect
 export type Atividade = typeof atividade.$inferSelect
@@ -66,16 +67,7 @@ export function insertMaterias(apiMaterias: ApiMateria[]): void {
 }
 
 export async function updateMaterias(cookies: string): Promise<void> {
-  const url = new URL('http://127.0.0.1:8765/update')
-  url.searchParams.set('cookies', cookies)
-
-  const response = await fetch(url, { method: 'POST' })
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}))
-    throw new Error((body as { detail?: string }).detail ?? `HTTP ${response.status}`)
-  }
-
-  const data = (await response.json()) as ApiResponse
+  const data = await callScraper(cookies)
   const semestre = getSemestreAtual()
   insertMaterias(data.turmas)
   insertAtividades(data.atividades ?? [], semestre)

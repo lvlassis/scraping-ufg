@@ -1,22 +1,13 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { rmSync } from 'fs'
-import { spawn, ChildProcess } from 'child_process'
 import { initDb, closeDb, getDataDir } from './db'
 import { getAccounts, upsertAccount, removeAccount, type Account } from './model/accounts'
-import { getMateriasPorSemestre, insertMaterias, insertAtividades, updateMaterias, getAtividadesPorMateria, getSemestreAtual, type ApiResponse } from './model/materia'
+import { getMateriasPorSemestre, insertMaterias, insertAtividades, updateMaterias, getAtividadesPorMateria, getSemestreAtual } from './model/materia'
+import { callScraper } from './scraper'
 
 const SIGAA_LOGIN_URL = 'https://sigaa.sistemas.ufg.br/sigaa/verTelaLogin.do'
 const SIGAA_PORTAL_PATH = '/portais/discente/discente.jsf'
-
-let sigaaApi: ChildProcess | null = null
-
-function startSigaaApi(): void {
-  const binary = join(process.resourcesPath, 'sigaa-api')
-  sigaaApi = spawn(binary)
-  sigaaApi.stdout?.on('data', (d) => process.stdout.write(`[sigaa-api] ${d}`))
-  sigaaApi.stderr?.on('data', (d) => process.stderr.write(`[sigaa-api] ${d}`))
-}
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -88,16 +79,7 @@ function openSigaaLoginWindow(): Promise<string> {
 }
 
 async function performLogin(cookies: string): Promise<Account> {
-  const url = new URL('http://127.0.0.1:8765/update')
-  url.searchParams.set('cookies', cookies)
-
-  const res = await fetch(url, { method: 'POST' })
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error((body as { detail?: string }).detail ?? `HTTP ${res.status}`)
-  }
-
-  const data = (await res.json()) as ApiResponse
+  const data = await callScraper(cookies)
 
   initDb(data.matricula)
   upsertAccount({ matricula: data.matricula, nome: data.nome })
@@ -138,7 +120,6 @@ app.whenReady().then(() => {
     removeAccount(matricula)
   })
 
-  if (app.isPackaged) startSigaaApi()
   createWindow()
 
   app.on('activate', () => {
@@ -147,6 +128,5 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
-  sigaaApi?.kill()
   if (process.platform !== 'darwin') app.quit()
 })
