@@ -15,7 +15,7 @@
 
       sigaaScraper = py.buildPythonPackage {
         pname = "sigaa-scraper";
-        version = "0.1.0";
+        version = "0.2.0";
         pyproject = true;
         src = pkgs.fetchFromGitHub {
           owner = "lvlassis";
@@ -29,7 +29,7 @@
 
       sigaaApiPkg = py.buildPythonPackage {
         pname = "sigaa-api";
-        version = "0.1.0";
+        version = "0.2.0";
         pyproject = true;
         src = ./sigaa-api;
         build-system = [ py.hatchling ];

@@ -13,11 +13,32 @@ export type ApiMateria = {
 }
 
 export type ApiAtividade = {
-  id: string
   tipo: string
   due: string | null
   nome: string
   materia: string
+}
+
+export type ApiResponse = {
+  matricula: string
+  nome: string
+  nome_titulo: string
+  curso: string
+  nivel: string
+  status: string
+  email: string
+  entrada: string
+  ip: number
+  ti: number
+  ta: number
+  qr: number
+  mge: number
+  mre: number
+  pmf: number
+  ch_exigida: number
+  ch_cursada: number
+  turmas: ApiMateria[]
+  atividades: ApiAtividade[]
 }
 
 export function getSemestreAtual(): string {
@@ -54,9 +75,9 @@ export async function updateMaterias(cookies: string): Promise<void> {
     throw new Error((body as { detail?: string }).detail ?? `HTTP ${response.status}`)
   }
 
-  const data = (await response.json()) as { materias: ApiMateria[]; atividades: ApiAtividade[] }
+  const data = (await response.json()) as ApiResponse
   const semestre = getSemestreAtual()
-  insertMaterias(data.materias)
+  insertMaterias(data.turmas)
   insertAtividades(data.atividades ?? [], semestre)
 }
 
@@ -67,7 +88,7 @@ export function getMateriasPorSemestre(semestre: string): Materia[] {
 export function insertAtividades(atividades: ApiAtividade[], semestre: string): void {
   if (atividades.length === 0) return
   const rows = atividades.map((a) => ({
-    id: a.id,
+    id: createHash('sha256').update(a.nome + a.materia + (a.due ?? '') + semestre).digest('hex'),
     tipo: a.tipo,
     due: a.due ?? null,
     nome: a.nome,
