@@ -37,12 +37,13 @@ jobs:
       - name: Create NixOS tarball
         run: |
           VERSION="${GITHUB_REF_NAME}"
-          mkdir -p nix-app/node_modules
-          cp -r out nix-app/
-          cp -r node_modules/better-sqlite3 nix-app/node_modules/
-          cp -r src/main/db/migrations nix-app/migrations
-          cp package.json nix-app/
-          tar -czf "sigaa-desktop-${VERSION}-linux-app.tar.gz" -C nix-app .
+          DIRNAME="sigaa-desktop-${VERSION}"
+          mkdir -p "${DIRNAME}/node_modules"
+          cp -r out "${DIRNAME}/"
+          cp -r node_modules/better-sqlite3 "${DIRNAME}/node_modules/"
+          cp -r src/main/db/migrations "${DIRNAME}/migrations"
+          cp package.json "${DIRNAME}/"
+          tar -czf "sigaa-desktop-${VERSION}-linux-app.tar.gz" "${DIRNAME}"
 
       - name: Compute Nix SRI hash
         id: nix-hash
