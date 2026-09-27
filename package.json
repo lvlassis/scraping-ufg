@@ -1,6 +1,11 @@
 {
   "name": "sigaa-desktop",
   "version": "0.1.0",
+  "description": "Cliente desktop para o SIGAA UFG",
+  "author": {
+    "name": "Lucas Vinícius de L. Assis",
+    "email": "lvlassis.2@gmail.com"
+  },
   "private": true,
   "main": "./out/main/index.js",
   "scripts": {
