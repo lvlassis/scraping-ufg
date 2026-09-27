@@ -3,3 +3,4 @@ out/
 dist/
 .direnv/
 /docs/.obsidian
+/.env
