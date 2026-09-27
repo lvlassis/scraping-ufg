@@ -26,7 +26,7 @@
 
         src = pkgs.fetchurl {
           url = "https://github.com/lvlassis/scraping-ufg/releases/download/${version}/sigaa-desktop-${version}-linux-app.tar.gz";
-          hash = "sha256-bU93UvFUPy0RI7Ou1SjiKIfzBALa6hENoSLV6hesAgk="; # nix-release-hash
+          hash = "sha256-KxfX6udQAXyio4jgsgTgi2kLFK1E7s/yBGDQi6zgzdE="; # nix-release-hash
         };
 
         nativeBuildInputs = with pkgs; [
