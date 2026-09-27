@@ -44,6 +44,11 @@
           mkdir -p $out/lib/sigaa-desktop
           cp -r . $out/lib/sigaa-desktop/
 
+          # prebuilds/ contém binários pré-compilados do npm para múltiplas plataformas
+          # (incluindo musl) que não são usados em runtime — electron-rebuild compilou
+          # o binário correto em build/Release/
+          rm -rf $out/lib/sigaa-desktop/node_modules/better-sqlite3/prebuilds
+
           mkdir -p $out/bin
           makeWrapper ${pkgs.electron}/bin/electron $out/bin/sigaa-desktop \
             --add-flags "$out/lib/sigaa-desktop/out/main/index.js"
