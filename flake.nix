@@ -50,7 +50,8 @@
 
           mkdir -p $out/bin
           makeWrapper ${pkgs.electron}/bin/electron $out/bin/sigaa-desktop \
-            --add-flags "$out/lib/sigaa-desktop/out/main/index.js"
+            --add-flags "$out/lib/sigaa-desktop/out/main/index.js" \
+            --set SIGAA_MIGRATIONS_PATH "$out/lib/sigaa-desktop/migrations"
 
           mkdir -p $out/share/applications
           cp ${desktopItem}/share/applications/* $out/share/applications/

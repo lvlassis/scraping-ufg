@@ -35,9 +35,10 @@ export function initDb(matricula: string): void {
   _sqlite = new Database(join(dataDir, `${matricula}.sqlite`))
   _db = drizzle(_sqlite, { schema })
 
-  const migrationsFolder = app.isPackaged
-    ? join(process.resourcesPath, 'migrations')
-    : join(__dirname, '../../src/main/db/migrations')
+  const migrationsFolder = process.env.SIGAA_MIGRATIONS_PATH
+    ?? (app.isPackaged
+      ? join(process.resourcesPath, 'migrations')
+      : join(__dirname, '../../src/main/db/migrations'))
 
   migrate(_db, { migrationsFolder })
 }
