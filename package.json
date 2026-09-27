@@ -26,7 +26,17 @@
     "appId": "com.okabe.sigaa-desktop",
     "productName": "Sigaa Desktop",
     "linux": {
-      "target": "AppImage"
+      "target": ["AppImage", "deb", "rpm", "pacman"]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
     "extraResources": [
       {

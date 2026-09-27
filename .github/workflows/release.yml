@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    outputs:
+      nix_hash: ${{ steps.nix-hash.outputs.hash }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild native modules
+        run: npx electron-rebuild -f -w better-sqlite3
+
+      - name: Build and package
+        run: npx electron-builder --linux --publish never
+
+      - name: Create NixOS tarball
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          mkdir -p nix-app/node_modules
+          cp -r out nix-app/
+          cp -r node_modules/better-sqlite3 nix-app/node_modules/
+          cp -r src/main/db/migrations nix-app/migrations
+          cp package.json nix-app/
+          tar -czf "sigaa-desktop-${VERSION}-linux-app.tar.gz" -C nix-app .
+
+      - name: Compute Nix SRI hash
+        id: nix-hash
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          HASH=$(python3 -c "
+          import hashlib, base64, sys
+          data = open(sys.argv[1], 'rb').read()
+          h = hashlib.sha256(data).digest()
+          print('sha256-' + base64.b64encode(h).decode())
+          " "sigaa-desktop-${VERSION}-linux-app.tar.gz")
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.pacman
+            sigaa-desktop-*-linux-app.tar.gz
+          if-no-files-found: error
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild native modules
+        run: npx electron-rebuild -f -w better-sqlite3
+
+      - name: Build and package
+        run: npx electron-builder --win --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: dist/*.exe
+          if-no-files-found: error
+
+  release:
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**
+          generate_release_notes: true
+
+  update-flake:
+    needs: [release, build-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update flake.nix version and hash
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          NIX_HASH="${{ needs.build-linux.outputs.nix_hash }}"
+          sed -i "s|version = \"[^\"]*\"; # nix-release-version|version = \"${VERSION}\"; # nix-release-version|" flake.nix
+          sed -i "s|hash = \"sha256-[^\"]*\"; # nix-release-hash|hash = \"${NIX_HASH}\"; # nix-release-hash|" flake.nix
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.nix
+          git diff --cached --quiet || git commit -m "chore: atualiza hash do flake para ${{ github.ref_name }}"
+          git push origin HEAD:main

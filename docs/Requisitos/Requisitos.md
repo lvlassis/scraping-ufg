@@ -10,4 +10,5 @@
 - [ ] [[RF-006 - Atualizar informações]]
 
 ## Requisitos Não Funcionais
-- [[RN-001 - Isolamento de dados entre contas]]
+- [x] [[RN-001 - Isolamento de dados entre contas]]
+- [[RN-002 - Multiplataforma]]
