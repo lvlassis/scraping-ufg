@@ -1,7 +1,7 @@
-# RF-006 - Atualizar informações
+# H006 - Atualizar informações
 
 - **Status:** Planejado 
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 21/09/2026
 - **Última Atualização:** 17/10/2026
 

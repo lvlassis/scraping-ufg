@@ -1,7 +1,7 @@
-# RF-005 - Registrar livro texto
+# H005 - Registrar livro texto
 
 - **Status:** Planejado 
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 21/09/2026
 - **Última Atualização:** 21/09/2026
 

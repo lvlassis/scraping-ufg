@@ -1,7 +1,7 @@
-# RF-001 - Quais as atividades
+# H001 - Quais as atividades
 
 - **Status:** Planejado 
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 21/09/2026
 - **Última Atualização:** 21/09/2026
 

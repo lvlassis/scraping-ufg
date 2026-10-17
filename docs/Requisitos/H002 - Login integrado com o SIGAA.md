@@ -1,7 +1,7 @@
-# RF-002 - Login integrado com o SIGAA
+# H002 - Login integrado com o SIGAA
 
 - **Status:** Concluido
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 2024-01-15
 - **Última Atualização:** 2024-02-20
 

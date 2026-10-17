@@ -1,16 +1,15 @@
 # {{title}}
 
 - **Status:** Planejado 
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** {{date}}
 - **Última Atualização:** {{date}}
 
 ## Descrição
-_Descreva o requisito_
+_Como usuário, quero..._
 
 ## Critérios de aceitação
 - [ ] Critério 1
 
 ## Implementado em
-- `src/services/authentication.ts` (linha XXX)
-- `src/utils/validators.ts` (função `validateUser`)
+- `src/` (linha XXX)

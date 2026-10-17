@@ -1,10 +1,10 @@
-# RF-004 - Visualizar detalhes da matéria
+# H004 - Visualizar detalhes da matéria
 
 - **Status:** Planejado 
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 21/09/2026
 - **Última Atualização:** 21/09/2026
-- **Dependências:** [[RF-005 - Registrar livro texto]]
+- **Dependências:** [[H005 - Registrar livro texto]]
 
 ## Descrição
 O usuário deve ser capaz de ter uma central de comando daquela matéria com informações relevantes, como:

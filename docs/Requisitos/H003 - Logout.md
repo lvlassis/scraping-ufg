@@ -1,7 +1,7 @@
-# RF-003 - Logout
+# H003 - Logout
 
 - **Status:** Implementado
-- **Tipo:** Funcional 
+- **Tipo:** História de Usuário 
 - **Data de Criação:** 2026-09-19
 - **Última Atualização:** 2026-09-19
 
