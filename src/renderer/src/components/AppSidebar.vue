@@ -1,10 +1,23 @@
 <script setup lang="ts">
-import { LayoutDashboard, BookOpen, ClipboardList, GraduationCap, Settings, LogOut } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { LayoutDashboard, BookOpen, ClipboardList, GraduationCap, Settings, LogOut, RefreshCw } from 'lucide-vue-next'
 import UserAvatar from './UserAvatar.vue'
 import type { Account } from '../types/api'
 
-defineProps<{ user: Account }>()
-defineEmits<{ logout: [] }>()
+const props = defineProps<{ user: Account }>()
+const emit = defineEmits<{ logout: []; refreshed: [] }>()
+
+const refreshing = ref(false)
+
+async function handleRefresh(): Promise<void> {
+  refreshing.value = true
+  try {
+    await window.api.refresh(props.user.matricula)
+    emit('refreshed')
+  } finally {
+    refreshing.value = false
+  }
+}
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Início', active: true },
@@ -17,9 +30,19 @@ const navItems = [
 
 <template>
   <aside class="w-56 shrink-0 bg-background border-r border-border flex flex-col">
-    <div class="px-5 py-4 border-b border-border">
-      <p class="font-semibold text-primary text-sm tracking-tight">SIGAA Desktop</p>
-      <p class="text-xs text-muted-foreground">UFG</p>
+    <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+      <div>
+        <p class="font-semibold text-primary text-sm tracking-tight">SIGAA Desktop</p>
+        <p class="text-xs text-muted-foreground">UFG</p>
+      </div>
+      <button
+        @click="handleRefresh"
+        :disabled="refreshing"
+        class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Atualizar dados"
+      >
+        <RefreshCw :size="15" :class="{ 'animate-spin': refreshing }" />
+      </button>
     </div>
 
     <nav class="flex-1 p-3 space-y-0.5">

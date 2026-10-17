@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import MateriasCard from '../components/dashboard/MateriasCard.vue'
 import PerfilCard from '../components/dashboard/PerfilCard.vue'
-import UpdatePanel from '../components/dashboard/UpdatePanel.vue'
 import DashboardMateria from './DashboardMateria.vue'
 import type { Account, Materia } from '../types/api'
 
@@ -39,8 +38,6 @@ onMounted(carregarMaterias)
       <h1 class="text-xl font-semibold text-foreground">Início</h1>
       <p class="text-sm text-muted-foreground">{{ semestre }}</p>
     </div>
-
-    <UpdatePanel class="mb-5" @updated="carregarMaterias" />
 
     <div class="grid grid-cols-3 gap-4">
       <div class="col-span-2">
