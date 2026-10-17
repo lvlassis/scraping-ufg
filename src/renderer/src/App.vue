@@ -13,6 +13,16 @@ const accounts = ref<Account[]>([])
 const currentUser = ref<Account | null>(null)
 const showLogoutDialog = ref(false)
 const removeData = ref(false)
+const dashboardKey = ref(0)
+const showToast = ref(false)
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+function onRefreshed(): void {
+  dashboardKey.value++
+  if (toastTimer) clearTimeout(toastTimer)
+  showToast.value = true
+  toastTimer = setTimeout(() => { showToast.value = false }, 3000)
+}
 
 onMounted(async () => {
   accounts.value = await window.api.getAccounts()
@@ -73,10 +83,19 @@ async function logoutAndRemove(): Promise<void> {
   </div>
 
   <div v-else class="h-screen flex overflow-hidden bg-muted">
-    <AppSidebar :user="currentUser!" @logout="showLogoutDialog = true" />
+    <AppSidebar :user="currentUser!" @logout="showLogoutDialog = true" @refreshed="onRefreshed" />
     <main class="flex-1 overflow-y-auto">
-      <Dashboard :user="currentUser!" />
+      <Dashboard :key="dashboardKey" :user="currentUser!" />
     </main>
+
+    <Transition name="toast">
+      <div
+        v-if="showToast"
+        class="toast fixed z-50 bg-background border border-border rounded-lg shadow-lg px-4 py-2.5 flex items-center gap-2"
+      >
+        <span class="text-xs font-medium text-foreground">Atualizado!</span>
+      </div>
+    </Transition>
 
     <Transition name="fade">
       <div
@@ -119,5 +138,20 @@ async function logoutAndRemove(): Promise<void> {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.toast {
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 0.2s ease, top 0.2s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  top: 0;
 }
 </style>
