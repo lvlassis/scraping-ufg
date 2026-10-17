@@ -22,7 +22,7 @@ const emit = defineEmits<{ select: [materia: Materia] }>()
       </div>
 
       <div v-if="materias.length === 0" class="py-8 text-center text-sm text-muted-foreground">
-        Nenhuma matéria para {{ semestre }}. Use o painel acima para atualizar.
+        Nenhuma matéria para {{ semestre }}. Clique no botão de atualizar para sincronizar.
       </div>
 
       <div v-else class="space-y-2">

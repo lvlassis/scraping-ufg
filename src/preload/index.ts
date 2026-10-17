@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 contextBridge.exposeInMainWorld('api', {
   getAccounts: () => ipcRenderer.invoke('auth:getAccounts'),
   openSigaaLogin: () => ipcRenderer.invoke('auth:openSigaaLogin'),
+  getCookies: (matricula: string) => ipcRenderer.invoke('auth:getCookies', matricula),
   refresh: (matricula: string) => ipcRenderer.invoke('auth:refresh', matricula),
   selectAccount: (matricula: string) => ipcRenderer.invoke('auth:selectAccount', matricula),
   logout: () => ipcRenderer.invoke('auth:logout'),

@@ -5,7 +5,7 @@ import UserAvatar from './UserAvatar.vue'
 import type { Account } from '../types/api'
 
 const props = defineProps<{ user: Account }>()
-const emit = defineEmits<{ logout: []; refreshed: [] }>()
+const emit = defineEmits<{ logout: []; refreshed: []; 'cookie-copied': [] }>()
 
 const refreshing = ref(false)
 
@@ -16,6 +16,14 @@ async function handleRefresh(): Promise<void> {
     emit('refreshed')
   } finally {
     refreshing.value = false
+  }
+}
+
+async function copyDebugCookie(): Promise<void> {
+  const cookie = await window.api.getCookies(props.user.matricula)
+  if (cookie) {
+    await navigator.clipboard.writeText(cookie)
+    emit('cookie-copied')
   }
 }
 
@@ -37,6 +45,7 @@ const navItems = [
       </div>
       <button
         @click="handleRefresh"
+        @contextmenu.prevent="copyDebugCookie"
         :disabled="refreshing"
         class="text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         title="Atualizar dados"

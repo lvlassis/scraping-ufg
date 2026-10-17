@@ -14,14 +14,18 @@ const currentUser = ref<Account | null>(null)
 const showLogoutDialog = ref(false)
 const removeData = ref(false)
 const dashboardKey = ref(0)
-const showToast = ref(false)
+const toastMessage = ref('')
 let toastTimer: ReturnType<typeof setTimeout> | null = null
+
+function showToast(message: string): void {
+  if (toastTimer) clearTimeout(toastTimer)
+  toastMessage.value = message
+  toastTimer = setTimeout(() => { toastMessage.value = '' }, 3000)
+}
 
 function onRefreshed(): void {
   dashboardKey.value++
-  if (toastTimer) clearTimeout(toastTimer)
-  showToast.value = true
-  toastTimer = setTimeout(() => { showToast.value = false }, 3000)
+  showToast('Atualizado!')
 }
 
 onMounted(async () => {
@@ -83,17 +87,17 @@ async function logoutAndRemove(): Promise<void> {
   </div>
 
   <div v-else class="h-screen flex overflow-hidden bg-muted">
-    <AppSidebar :user="currentUser!" @logout="showLogoutDialog = true" @refreshed="onRefreshed" />
+    <AppSidebar :user="currentUser!" @logout="showLogoutDialog = true" @refreshed="onRefreshed" @cookie-copied="showToast('Cookie copiado!')" />
     <main class="flex-1 overflow-y-auto">
       <Dashboard :key="dashboardKey" :user="currentUser!" />
     </main>
 
     <Transition name="toast">
       <div
-        v-if="showToast"
+        v-if="toastMessage"
         class="toast fixed z-50 bg-background border border-border rounded-lg shadow-lg px-4 py-2.5 flex items-center gap-2"
       >
-        <span class="text-xs font-medium text-foreground">Atualizado!</span>
+        <span class="text-xs font-medium text-foreground">{{ toastMessage }}</span>
       </div>
     </Transition>
 

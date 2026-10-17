@@ -99,6 +99,8 @@ app.whenReady().then(() => {
     return performLogin(cookies)
   })
 
+  ipcMain.handle('auth:getCookies', (_, matricula: string): string | undefined => getCookies(matricula))
+
   ipcMain.handle('auth:refresh', async (_, matricula: string): Promise<void> => {
     const saved = getCookies(matricula)
     if (saved) {

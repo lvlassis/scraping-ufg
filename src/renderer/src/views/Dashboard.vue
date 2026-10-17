@@ -34,23 +34,19 @@ onMounted(carregarMaterias)
   />
 
   <div v-else class="p-6">
-    <div class="mb-5">
-      <h1 class="text-xl font-semibold text-foreground">Início</h1>
-      <p class="text-sm text-muted-foreground">{{ semestre }}</p>
-    </div>
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-5">
+        <h1 class="text-xl font-semibold text-foreground">Início</h1>
+        <p class="text-sm text-muted-foreground">{{ semestre }}</p>
+      </div>
 
-    <div class="grid grid-cols-3 gap-4">
-      <div class="col-span-2">
-        <MateriasCard :materias="materias" :semestre="semestre" @select="selectedMateria = $event" />
-      </div>
-      <div class="col-span-1">
-        <PerfilCard :user="props.user" :semestre="semestre" />
-      </div>
-      <div class="col-span-1 bg-muted rounded-md border border-border p-5 flex items-center justify-center min-h-36">
-        <p class="text-sm text-muted-foreground">Em breve</p>
-      </div>
-      <div class="col-span-2 bg-muted rounded-md border border-border p-5 flex items-center justify-center min-h-36">
-        <p class="text-sm text-muted-foreground">Em breve</p>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2">
+          <MateriasCard :materias="materias" :semestre="semestre" @select="selectedMateria = $event" />
+        </div>
+        <div class="col-span-1">
+          <PerfilCard :user="props.user" :semestre="semestre" :materias-count="materias.length" />
+        </div>
       </div>
     </div>
   </div>

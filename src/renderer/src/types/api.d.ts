@@ -25,6 +25,7 @@ declare global {
     api: {
       getAccounts(): Promise<Account[]>
       openSigaaLogin(): Promise<Account>
+      getCookies(matricula: string): Promise<string | undefined>
       refresh(matricula: string): Promise<void>
       selectAccount(matricula: string): Promise<Account>
       logout(): Promise<void>
