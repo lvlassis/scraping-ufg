@@ -1,7 +1,7 @@
-# Scraping Sigaa - Requisitos
+# Scraping Sigaa - Backlog
 [[Home]]
 
-## Histórias de Usuários
+## Funcionais
 - [ ] [[H001 - Quais as atividades]]
 - [x] [[H002 - Login integrado com o SIGAA]]
 - [x] [[H003 - Logout]]
@@ -10,7 +10,10 @@
 - [x] [[H006 - Atualizar informações]]
 - [x] [[H007 - Copiar cookies em Debug]]
 - [ ] [[H008 - Dashboard Matéria Útil]]
-
-## Requisitos Não Funcionais
+    - [ ] [[H008T01 - Implementar Scraping dos Materiais de Estudo de cada Matéria]]
+    - [ ] [[H008T02 - Implementar Scraping do Planejamento das Aulas de cada Matéria]]
+## Não Funcionais
 - [x] [[RN-001 - Isolamento de dados entre contas]]
 - [[RN-002 - Multiplataforma]]
+- [ ] [[H009 - Atalhos de Teclado Configuráveis]]
+- [ ] [[E010 - Suporte a Múltiplas Bases de Dados]]

@@ -10,7 +10,8 @@ Quero resolver os seguintes problemas:
 5. Quando serão as provas? 
 6. Há atividades para fazer?
 7. Quais os livros textos? 
-8. Quais os materiais que o professor passou?
+8. Quais os materiais que o professor passou? ^9c0762
+    - [[H008T01 - Implementar Scraping dos Materiais de Estudo de cada Matéria]]
 9. Qual foi o assunto que o professor tratou em cada aula? 
 10. Já estudei esse assunto que ele passou? 
 11. Quanto tempo dediquei a essa matéria? 
