@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { rmSync } from 'fs'
 import { initDb, closeDb, getDataDir } from './db'
-import { getAccounts, upsertAccount, removeAccount, type Account } from './model/accounts'
+import { getAccounts, upsertAccount, removeAccount, saveCookies, getCookies, type Account } from './model/accounts'
 import { getMateriasPorSemestre, insertMaterias, insertAtividades, updateMaterias, getAtividadesPorMateria, getSemestreAtual } from './model/materia'
 import { callScraper } from './scraper'
 
@@ -83,6 +83,7 @@ async function performLogin(cookies: string): Promise<Account> {
 
   initDb(data.matricula)
   upsertAccount({ matricula: data.matricula, nome: data.nome })
+  saveCookies(data.matricula, cookies)
   const semestre = getSemestreAtual()
   insertMaterias(data.turmas)
   insertAtividades(data.atividades ?? [], semestre)
@@ -98,15 +99,26 @@ app.whenReady().then(() => {
     return performLogin(cookies)
   })
 
-  // Mantido para o painel de atualização manual no Dashboard
-  ipcMain.handle('auth:login', (_, cookies: string): Promise<Account> => performLogin(cookies))
+  ipcMain.handle('auth:refresh', async (_, matricula: string): Promise<void> => {
+    const saved = getCookies(matricula)
+    if (saved) {
+      try {
+        await updateMaterias(saved)
+        return
+      } catch {
+        // cookie expirado — abre janela de login
+      }
+    }
+    const cookies = await openSigaaLoginWindow()
+    saveCookies(matricula, cookies)
+    await updateMaterias(cookies)
+  })
 
   ipcMain.handle('auth:selectAccount', (_, matricula: string): Account | null => {
     initDb(matricula)
     return getAccounts().find((a) => a.matricula === matricula) ?? null
   })
 
-  ipcMain.handle('materia:update', (_, cookies: string) => updateMaterias(cookies))
   ipcMain.handle('materia:getBySemestre', (_, semestre: string) => getMateriasPorSemestre(semestre))
   ipcMain.handle('materia:getAtividades', (_, materiaNome: string, semestre: string) => getAtividadesPorMateria(materiaNome, semestre))
 
