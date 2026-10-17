@@ -16,6 +16,12 @@ export default defineConfig({
         '@': path.resolve(__dirname, './src/renderer/src')
       }
     },
-    plugins: [vue(), tailwindcss()]
+    plugins: [vue(), tailwindcss()],
+    server: {
+      host: '127.0.0.1',
+      watch: {
+        usePolling: true,
+      },
+    }
   }
 })
