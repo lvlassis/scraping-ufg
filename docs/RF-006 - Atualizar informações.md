@@ -3,14 +3,14 @@
 - **Status:** Planejado 
 - **Tipo:** Funcional 
 - **Data de Criação:** 21/09/2026
-- **Última Atualização:** 21/09/2026
+- **Última Atualização:** 17/10/2026
 
 ## Descrição
 O usuário deve ser capaz de atualizar as informações do cache com um botão.
 
 ## Critérios de aceitação
-- [ ] Botão de atualização do banco
+- [x] Botão de atualização do banco
+- [x] Toast de feedback ao usuário
 
-## Implementado em
-- `src/services/authentication.ts` (linha XXX)
-- `src/utils/validators.ts` (função `validateUser`)
+## Alterações
+- 17/10/2026 - Implementado

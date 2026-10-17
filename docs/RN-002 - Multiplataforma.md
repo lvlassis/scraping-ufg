@@ -13,11 +13,11 @@ O programa deve estar disponível para dos 3 principais sistemas operacionais:
 
 ## Critérios de aceitação
 Pipeline de compilação para:
-- [ ] NixOS
-- [ ] Archlinux
-- [ ] Windows
-- [ ] RedHat
-- [ ] Debian
-- [ ] MacOS
+- [x] NixOS (Testado)
+- [ ] Archlinux (Falta testar)
+- [ ] Windows (Falta testar)
+- [ ] RedHat (Falta testar)
+- [ ] Debian (Falta testar)
+- [ ] MacOS (Fazer)
 
 ## Implementado em
