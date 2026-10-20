@@ -1,13 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { join } from 'path'
-import { rmSync } from 'fs'
-import { initDb, closeDb, getDataDir } from './db'
-import { getAccounts, upsertAccount, removeAccount, saveCookies, getCookies, type Account } from './model/accounts'
-import { getMateriasPorSemestre, insertMaterias, insertAtividades, updateMaterias, getAtividadesPorMateria, getSemestreAtual } from './model/materia'
-import { callScraper } from './scraper'
-
-const SIGAA_LOGIN_URL = 'https://sigaa.sistemas.ufg.br/sigaa/verTelaLogin.do'
-const SIGAA_PORTAL_PATH = '/portais/discente/discente.jsf'
+import { Kernel } from './kernel/Kernel'
+import { loadPlugins } from './kernel/PluginLoader'
+import { registerBuiltinCommands } from './kernel/builtinCommands'
+import { migrateToWorkspaces } from './model/workspaces'
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -25,114 +21,13 @@ function createWindow(): void {
   }
 }
 
-function openSigaaLoginWindow(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const loginWin = new BrowserWindow({
-      width: 900,
-      height: 700,
-      title: 'Login SIGAA',
-      webPreferences: {
-        // Sessão não-persistente: começa limpa a cada login, sem cookies residuais
-        partition: 'sigaa-login',
-      },
-    })
-
-    loginWin.loadURL(SIGAA_LOGIN_URL)
-
-    let settled = false
-
-    // did-finish-load garante que o JS da página executou e todos os cookies foram setados
-    loginWin.webContents.on('did-finish-load', async () => {
-      if (settled) return
-      if (!loginWin.webContents.getURL().includes(SIGAA_PORTAL_PATH)) return
-
-      settled = true
-
-      try {
-        const allCookies = await loginWin.webContents.session.cookies.get({})
-        console.log('[debug] cookies após did-finish-load:')
-        allCookies.forEach((c) => console.log(`  ${c.domain} | ${c.name} = ${c.value.slice(0, 40)}...`))
-
-        const jsess = allCookies.find((c) => c.name === 'JSESSIONID')
-        const sess = allCookies.find((c) => c.name === '_ufg_br_sess')
-
-        if (!jsess) {
-          throw new Error('JSESSIONID não encontrado após login')
-        }
-
-        const cookieStr = sess
-          ? `_ufg_br_sess=${sess.value}; JSESSIONID=${jsess.value}`
-          : `JSESSIONID=${jsess.value}`
-
-        resolve(cookieStr)
-        loginWin.close()
-      } catch (e) {
-        reject(e)
-        loginWin.close()
-      }
-    })
-
-    loginWin.on('closed', () => {
-      if (!settled) reject(new Error('Login cancelado pelo usuário'))
-    })
-  })
-}
-
-async function performLogin(cookies: string): Promise<Account> {
-  const data = await callScraper(cookies)
-
-  initDb(data.matricula)
-  upsertAccount({ matricula: data.matricula, nome: data.nome })
-  saveCookies(data.matricula, cookies)
-  const semestre = getSemestreAtual()
-  insertMaterias(data.turmas)
-  insertAtividades(data.atividades ?? [], semestre)
-
-  return { matricula: data.matricula, nome: data.nome }
-}
-
 app.whenReady().then(() => {
-  ipcMain.handle('auth:getAccounts', (): Account[] => getAccounts())
+  migrateToWorkspaces()
 
-  ipcMain.handle('auth:openSigaaLogin', async (): Promise<Account> => {
-    const cookies = await openSigaaLoginWindow()
-    return performLogin(cookies)
-  })
-
-  ipcMain.handle('auth:getCookies', (_, matricula: string): string | undefined => getCookies(matricula))
-
-  ipcMain.handle('auth:refresh', async (_, matricula: string): Promise<void> => {
-    const saved = getCookies(matricula)
-    if (saved) {
-      try {
-        await updateMaterias(saved)
-        return
-      } catch {
-        // cookie expirado — abre janela de login
-      }
-    }
-    const cookies = await openSigaaLoginWindow()
-    saveCookies(matricula, cookies)
-    await updateMaterias(cookies)
-  })
-
-  ipcMain.handle('auth:selectAccount', (_, matricula: string): Account | null => {
-    initDb(matricula)
-    return getAccounts().find((a) => a.matricula === matricula) ?? null
-  })
-
-  ipcMain.handle('materia:getBySemestre', (_, semestre: string) => getMateriasPorSemestre(semestre))
-  ipcMain.handle('materia:getAtividades', (_, materiaNome: string, semestre: string) => getAtividadesPorMateria(materiaNome, semestre))
-
-  ipcMain.handle('auth:logout', (): void => {
-    closeDb()
-  })
-
-  ipcMain.handle('auth:removeAccount', (_, matricula: string): void => {
-    closeDb()
-    try { rmSync(join(getDataDir(), `${matricula}.sqlite`)) } catch {}
-    removeAccount(matricula)
-  })
+  const kernel = new Kernel()
+  loadPlugins(kernel)
+  registerBuiltinCommands(kernel)
+  kernel.wireIpcHandlers()
 
   createWindow()
 

@@ -1,3 +1,6 @@
 # Diário de Desenvolvimento
-
-- [[2026-10-17]]
+```dataview
+LIST
+FROM "Diário"
+SORT file.name DESC
+```

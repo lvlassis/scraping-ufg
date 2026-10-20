@@ -15,6 +15,10 @@ export function getDataDir(): string {
   return join(app.getPath('home'), '.local', 'share', 'sigaa-desktop')
 }
 
+export function sanitizeDbName(accountId: string): string {
+  return accountId.replace(':', '_')
+}
+
 export function getDb(): Db {
   if (!_db) throw new Error('DB não inicializado — chame initDb() primeiro')
   return _db
@@ -26,17 +30,18 @@ export function closeDb(): void {
   _db = null
 }
 
-export function initDb(matricula: string): void {
+export function initDb(accountId: string): void {
   _sqlite?.close()
 
   const dataDir = getDataDir()
   mkdirSync(dataDir, { recursive: true })
 
-  _sqlite = new Database(join(dataDir, `${matricula}.sqlite`))
+  _sqlite = new Database(join(dataDir, `${sanitizeDbName(accountId)}.sqlite`))
   _db = drizzle(_sqlite, { schema })
 
-  const migrationsFolder = process.env.SIGAA_MIGRATIONS_PATH
-    ?? (app.isPackaged
+  const migrationsFolder =
+    process.env.SIGAA_MIGRATIONS_PATH ??
+    (app.isPackaged
       ? join(process.resourcesPath, 'migrations')
       : join(__dirname, '../../src/main/db/migrations'))
 

@@ -1,6 +1,22 @@
-export type Account = {
-  matricula: string
-  nome: string
+export type Workspace = {
+  id: string
+  name: string
+  createdAt: string
+}
+
+export type ConnectorInfo = {
+  id: string
+  displayName: string
+  description?: string
+  authMethod: 'browser-window' | 'oauth' | 'session'
+}
+
+export type ConnectorStatus = {
+  connectorId: string
+  connectorDisplayName: string
+  userId?: string
+  displayName?: string
+  enabled: boolean
 }
 
 export type Materia = {
@@ -20,18 +36,47 @@ export type Atividade = {
   semestre: string
 }
 
+export type CommandInfo = {
+  id: string
+  label: string
+  connectorId: string
+  connectorDisplayName: string
+}
+
+export type WorkspaceShortcut = {
+  commandId: string
+  accelerator: string
+}
+
 declare global {
   interface Window {
     api: {
-      getAccounts(): Promise<Account[]>
-      openSigaaLogin(): Promise<Account>
-      getCookies(matricula: string): Promise<string | undefined>
-      refresh(matricula: string): Promise<void>
-      selectAccount(matricula: string): Promise<Account>
-      logout(): Promise<void>
-      removeAccount(matricula: string): Promise<void>
+      // Workspace management
+      getWorkspaces(): Promise<Workspace[]>
+      createWorkspace(name: string): Promise<Workspace>
+      openWorkspace(id: string): Promise<Workspace | null>
+      closeWorkspace(): Promise<void>
+      removeWorkspace(id: string): Promise<void>
+
+      // Plugin management
+      getConnectors(): Promise<ConnectorInfo[]>
+      getPlugins(): Promise<ConnectorStatus[]>
+      addPlugin(connectorId: string): Promise<ConnectorStatus>
+      refreshAll(): Promise<void>
+      refreshPlugin(connectorId: string): Promise<void>
+      removePlugin(connectorId: string): Promise<void>
+      togglePlugin(connectorId: string, enabled: boolean): Promise<void>
+
+      // Data
       getMateriasPorSemestre(semestre: string): Promise<Materia[]>
       getAtividadesPorMateria(materiaNome: string, semestre: string): Promise<Atividade[]>
+
+      // Commands & shortcuts
+      getCommands(): Promise<CommandInfo[]>
+      getShortcuts(): Promise<WorkspaceShortcut[]>
+      setShortcut(commandId: string, accelerator: string): Promise<void>
+      removeShortcut(commandId: string): Promise<void>
+      executeCommand(commandId: string): Promise<void>
     }
   }
 }

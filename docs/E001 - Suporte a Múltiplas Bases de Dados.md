@@ -20,6 +20,8 @@ Idealmente, o código fonte dos plugins deve estar disponível no github para do
 Será importante ter uma interface bem definida para os plugins.
 ## Critérios de aceitação
 - [ ] 
+## Sub Tarefas
+- [[E001T01 - Refatorar para Arquitetura de Microkernel]]
 
 ## Implementado em
 - `src/` (linha XXX)

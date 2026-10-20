@@ -1,7 +1,8 @@
 import { spawn } from 'child_process'
 import { app } from 'electron'
 import { join } from 'path'
-import type { ApiResponse } from './model/materia'
+import type { ConnectorCredential } from '../../main/kernel/types'
+import type { ApiResponse } from './types'
 
 function getScraperBin(): string {
   if (process.env.SIGAA_SCRAPER_PATH) return process.env.SIGAA_SCRAPER_PATH
@@ -13,7 +14,13 @@ function getScraperBin(): string {
   return 'sigaa-scraper'
 }
 
-export function callScraper(cookies: string): Promise<ApiResponse> {
+function credentialToCookieStr(credential: ConnectorCredential): string {
+  return Object.entries(credential)
+    .map(([k, v]) => `${k}=${v}`)
+    .join('; ')
+}
+
+export function callScraper(credential: ConnectorCredential): Promise<ApiResponse> {
   return new Promise((resolve, reject) => {
     const proc = spawn(getScraperBin(), ['discente'], { stdio: ['pipe', 'pipe', 'pipe'] })
 
@@ -36,7 +43,7 @@ export function callScraper(cookies: string): Promise<ApiResponse> {
     })
 
     proc.on('error', reject)
-    proc.stdin.write(cookies)
+    proc.stdin.write(credentialToCookieStr(credential))
     proc.stdin.end()
   })
 }

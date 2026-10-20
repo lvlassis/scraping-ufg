@@ -16,4 +16,5 @@
 - [x] [[RN-001 - Isolamento de dados entre contas]]
 - [[RN-002 - Multiplataforma]]
 - [ ] [[H009 - Atalhos de Teclado Configuráveis]]
-- [ ] [[E010 - Suporte a Múltiplas Bases de Dados]]
+- [ ] [[E001 - Suporte a Múltiplas Bases de Dados]]
+- [ ] [[E002 - Sigaa Scraper - Criar SDKs para Python e Node]]

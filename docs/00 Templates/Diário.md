@@ -1,0 +1,3 @@
+# Diário - {{date}}
+
+## Anotações
