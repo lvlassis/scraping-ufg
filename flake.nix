@@ -8,7 +8,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
-      version = "0.1.0"; # nix-release-version
+      version = "0.1.1"; # nix-release-version
 
       desktopItem = pkgs.makeDesktopItem {
         name = "sigaa-desktop";
@@ -26,7 +26,7 @@
 
         src = pkgs.fetchurl {
           url = "https://github.com/lvlassis/scraping-ufg/releases/download/${version}/sigaa-desktop-${version}-linux-app.tar.gz";
-          hash = "sha256-4Psecd24qhMNf/mOTraYR2sqPibZ2YkG7/u2RanjyKo="; # nix-release-hash
+          hash = "sha256-8Xrv8jkiINGD3oVFsVxfoMS75MlzqdyEBC+39uN7XTM="; # nix-release-hash
         };
 
         nativeBuildInputs = with pkgs; [
