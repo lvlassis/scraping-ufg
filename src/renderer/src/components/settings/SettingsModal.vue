@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { X, Layers, Keyboard } from 'lucide-vue-next'
 import PluginSigaaSettings from './PluginSigaaSettings.vue'
+import PluginTuringSettings from './PluginTuringSettings.vue'
 import PluginStubSettings from './PluginStubSettings.vue'
 import ShortcutsSettings from './ShortcutsSettings.vue'
 import type { ConnectorInfo, ConnectorStatus } from '../../types/api'
@@ -130,6 +131,13 @@ async function onToggled(): Promise<void> {
             <PluginSigaaSettings
               v-if="selectedSection === 'sigaa-ufg'"
               :plugin="getPlugin('sigaa-ufg')"
+              @connected="onConnected"
+              @disconnected="onDisconnected"
+              @toggled="onToggled"
+            />
+            <PluginTuringSettings
+              v-else-if="selectedSection === 'turing'"
+              :plugin="getPlugin('turing')"
               @connected="onConnected"
               @disconnected="onDisconnected"
               @toggled="onToggled"

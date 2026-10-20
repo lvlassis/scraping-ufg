@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('api', {
   // Plugin management (within current workspace)
   getConnectors: () => ipcRenderer.invoke('kernel:getConnectors'),
   getPlugins: () => ipcRenderer.invoke('kernel:getPlugins'),
-  addPlugin: (connectorId: string) => ipcRenderer.invoke('kernel:addPlugin', connectorId),
+  addPlugin: (connectorId: string, ...extra: unknown[]) => ipcRenderer.invoke('kernel:addPlugin', connectorId, ...extra),
   refreshAll: () => ipcRenderer.invoke('kernel:refreshAll'),
   refreshPlugin: (connectorId: string) => ipcRenderer.invoke('kernel:refreshPlugin', connectorId),
   removePlugin: (connectorId: string) => ipcRenderer.invoke('kernel:removePlugin', connectorId),

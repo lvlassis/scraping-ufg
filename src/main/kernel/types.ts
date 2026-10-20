@@ -122,7 +122,7 @@ export interface KernelAPI {
 
 export interface ConnectorAuth {
   method: 'browser-window' | 'oauth' | 'session'
-  login(kernel: KernelAPI): Promise<WorkspacePlugin>
+  login(kernel: KernelAPI, ...extra: unknown[]): Promise<WorkspacePlugin>
   refresh(workspaceId: string, plugin: WorkspacePlugin, kernel: KernelAPI): Promise<void>
 }
 

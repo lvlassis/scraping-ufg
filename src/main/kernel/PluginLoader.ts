@@ -1,10 +1,11 @@
 import type { KernelAPI, ConnectorPlugin } from './types'
 import { sigaaUfgPlugin } from '../../plugins/sigaa-ufg'
+import { turingPlugin } from '../../plugins/turing'
 
 const BUILT_IN_PLUGINS: ConnectorPlugin[] = [
   sigaaUfgPlugin,
+  turingPlugin,
   // classroomPlugin,
-  // turingPlugin,
 ]
 
 export function loadPlugins(kernel: KernelAPI): void {

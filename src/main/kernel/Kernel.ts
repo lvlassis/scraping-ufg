@@ -146,12 +146,12 @@ export class Kernel implements KernelAPI {
       if (this.currentWorkspaceId === id) this.currentWorkspaceId = null
     })
 
-    ipcMain.handle('kernel:addPlugin', async (_, connectorId: string): Promise<ConnectorStatus> => {
+    ipcMain.handle('kernel:addPlugin', async (_, connectorId: string, ...extra: unknown[]): Promise<ConnectorStatus> => {
       const wsId = this.currentWorkspaceId
       if (!wsId) throw new Error('Nenhum workspace ativo')
       const def = this.connectors.get(connectorId)
       if (!def) throw new Error(`Unknown connector: ${connectorId}`)
-      const plugin = await def.auth.login(this)
+      const plugin = await def.auth.login(this, ...extra)
       upsertPlugin(wsId, plugin)
       return this.toConnectorStatus(plugin)
     })

@@ -11,6 +11,5 @@ Como usuário, preciso de teclas de atalho de teclado para melhor experiência n
 Vou pensando melhor nos atalhos conforme o tempo. Por hora, principalmente atalhos de navegação.
 
 ## Critérios de aceitação
-- [ ] Critério 1
 
 ## Implementado em

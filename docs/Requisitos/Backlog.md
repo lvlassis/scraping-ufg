@@ -12,9 +12,10 @@
 - [ ] [[H008 - Dashboard Matéria Útil]]
     - [ ] [[H008T01 - Implementar Scraping dos Materiais de Estudo de cada Matéria]]
     - [ ] [[H008T02 - Implementar Scraping do Planejamento das Aulas de cada Matéria]]
+- [ ] [[E001 - Suporte a Múltiplas Bases de Dados]]
+- [ ] [[E009 - Implementar plugin do Turing]]
 ## Não Funcionais
 - [x] [[RN-001 - Isolamento de dados entre contas]]
 - [[RN-002 - Multiplataforma]]
-- [ ] [[H009 - Atalhos de Teclado Configuráveis]]
-- [ ] [[E001 - Suporte a Múltiplas Bases de Dados]]
+- [x] [[H009 - Atalhos de Teclado Configuráveis]]
 - [ ] [[E002 - Sigaa Scraper - Criar SDKs para Python e Node]]

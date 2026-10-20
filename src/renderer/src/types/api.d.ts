@@ -61,7 +61,7 @@ declare global {
       // Plugin management
       getConnectors(): Promise<ConnectorInfo[]>
       getPlugins(): Promise<ConnectorStatus[]>
-      addPlugin(connectorId: string): Promise<ConnectorStatus>
+      addPlugin(connectorId: string, ...extra: unknown[]): Promise<ConnectorStatus>
       refreshAll(): Promise<void>
       refreshPlugin(connectorId: string): Promise<void>
       removePlugin(connectorId: string): Promise<void>
